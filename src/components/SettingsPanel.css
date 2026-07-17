@@ -1,0 +1,60 @@
+.settings-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+  width: min(480px, 100%);
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.settings-header h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.setting-row {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.setting-row label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.setting-row select,
+.setting-row input {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-card-border);
+  background: var(--color-card);
+  color: var(--color-text);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.info {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  border-top: 1px solid var(--color-card-border);
+  padding-top: 12px;
+}
+
+.ghost-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-card-border);
+  font-size: 13px;
+  cursor: pointer;
+}
+.ghost-btn:hover { background: var(--color-card); }

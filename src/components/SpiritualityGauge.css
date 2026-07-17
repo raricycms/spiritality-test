@@ -1,0 +1,121 @@
+.gauge {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 28px;
+  border-radius: 16px;
+  background: var(--color-card);
+  border: 1px solid var(--color-card-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-card);
+  width: min(420px, 100%);
+}
+
+.gauge-title {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.5px;
+}
+
+.probability {
+  font-size: 36px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.5px;
+  color: var(--color-text);
+}
+
+.gauge.low .probability { color: var(--color-text-secondary); }
+.gauge.mid .probability { color: var(--color-accent); }
+.gauge.high .probability { color: var(--color-success); }
+
+.meter {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-bg);
+  overflow: hidden;
+  position: relative;
+}
+
+.meter-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width var(--duration-slow) var(--ease-out),
+              background var(--duration-slow) var(--ease-out);
+}
+
+.gauge.low .meter-fill { background: var(--color-text-muted); }
+.gauge.mid .meter-fill { background: var(--color-accent); }
+.gauge.high .meter-fill { background: var(--color-success); }
+
+.interpretation {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.formula {
+  font-family: 'Menlo', 'SF Mono', monospace;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  word-break: break-all;
+}
+
+.sub {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.view-switch {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.view-switch button {
+  padding: 4px 10px;
+  font-size: 11px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid var(--color-card-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.view-switch button:hover {
+  background: var(--color-bg);
+}
+
+.view-switch button.active {
+  background: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+}
+
+.gauge.empty {
+  text-align: center;
+  align-items: center;
+}
+
+.empty-text {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.ci-view { text-align: center; align-items: center; }
+
+.ci-range {
+  font-size: 24px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.ci-bar {
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
