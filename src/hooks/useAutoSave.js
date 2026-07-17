@@ -10,7 +10,6 @@ export function useAutoSave(session, history) {
   useEffect(() => {
     if (!session) return
     const id = setTimeout(() => {
-      // Persist the in-progress session appended to history.
       const exists = history.some((s) => s.id === session.id)
       const next = exists
         ? history.map((s) => (s.id === session.id ? session : s))

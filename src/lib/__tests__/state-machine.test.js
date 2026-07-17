@@ -58,6 +58,34 @@ describe('state-machine — inviolable target timing', () => {
     expect(() => sm.submitGuess(session, id, 3)).toThrow(/status REVEALED/)
   })
 
+  it('previewGuess can update an already-GUESSING round (change of mind before submit)', () => {
+    vi.spyOn(rng, 'generateTarget').mockImplementation(() => 2)
+    let session = sm.beginSession()
+    session = sm.enterNewRound(session)
+    const id = session.rounds[0].id
+    session = sm.previewGuess(session, id, 1) // TARGET_READY -> GUESSING(1)
+    expect(session.rounds[0].status).toBe('GUESSING')
+    expect(session.rounds[0].guess).toBe(1)
+    // User changes mind: must succeed, not throw.
+    session = sm.previewGuess(session, id, 4)
+    expect(session.rounds[0].status).toBe('GUESSING')
+    expect(session.rounds[0].guess).toBe(4)
+    // Target is untouched across previews.
+    expect(session.rounds[0].target).toBe(2)
+  })
+
+  it('previewGuess(null) on a GUESSING round clears back to TARGET_READY', () => {
+    vi.spyOn(rng, 'generateTarget').mockImplementation(() => 3)
+    let session = sm.beginSession()
+    session = sm.enterNewRound(session)
+    const id = session.rounds[0].id
+    session = sm.previewGuess(session, id, 2)
+    expect(session.rounds[0].status).toBe('GUESSING')
+    session = sm.previewGuess(session, id, null)
+    expect(session.rounds[0].status).toBe('TARGET_READY')
+    expect(session.rounds[0].guess).toBeNull()
+  })
+
   it('abandonRound marks non-terminal round; completeSession requires IN_PROGRESS session status', () => {
     vi.spyOn(rng, 'generateTarget').mockImplementation(() => 1)
     let session = sm.beginSession({ roundsPerSession: 2 })

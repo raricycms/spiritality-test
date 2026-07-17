@@ -29,7 +29,14 @@ export function useHistory() {
   const appendSession = useCallback(
     (session) => {
       setHistory((prev) => {
-        const next = [...prev, session]
+        // Idempotent: if a session with the same id is already present
+        // (e.g., the user resumed an IN_PROGRESS session from localStorage
+        // and we are now finalising it), replace in place rather than
+        // appending a duplicate.
+        const exists = prev.some((s) => s.id === session.id)
+        const next = exists
+          ? prev.map((s) => (s.id === session.id ? session : s))
+          : [...prev, session]
         saveSessions(next)
         return next
       })

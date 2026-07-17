@@ -75,7 +75,8 @@ export function App() {
         if (!session || session.status !== 'IN_PROGRESS' || !activeRound) {
           // history view or completed — only Enter / Space do anything
           if (action.type === 'enter' && isCompleted) {
-            endAndArchive()  // archive then -> reset
+            const finalSession = endAndArchive()
+            if (finalSession) appendSession(finalSession)
             return
           }
           return
@@ -123,12 +124,9 @@ export function App() {
 
   // Handle restart from summary
   function handleArchiveAndReset() {
-    const next = endAndArchive()
-    if (next) {
-      start()
-    } else {
-      start()
-    }
+    const finalSession = endAndArchive()
+    if (finalSession) appendSession(finalSession)
+    start()
   }
 
   function handleExport() {

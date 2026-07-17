@@ -15,9 +15,6 @@ import {
   findActiveRound,
 } from '../lib/state-machine.js'
 import { summarizeSession } from '../lib/storage.js'
-import {
-  saveSessions,
-} from '../lib/storage.js'
 
 const initial = { session: null, history: [] }
 
@@ -54,10 +51,6 @@ export function useSession({ history, settings }) {
     () => (currentSession ? findActiveRound(currentSession) : null),
     [currentSession],
   )
-
-  const persistHistory = useCallback((history) => {
-    saveSessions(history)
-  }, [])
 
   const start = useCallback(() => {
     const s = beginSession({ roundsPerSession: settings.roundsPerSession })
@@ -118,18 +111,23 @@ export function useSession({ history, settings }) {
     if (!currentSession) return null
     // After a normal session completion, currentSession is already COMPLETED
     // (set in onSubmit). The mid-session abandon path sets it to IN_PROGRESS
-    // and we need to compute & attach a summary before saving.
+    // and we need to compute & attach a summary before persisting.
+    //
+    // We do NOT write to localStorage here. The caller is expected to pass
+    // the returned session to `appendSession` (or equivalent) so that
+    // useHistory's React state stays in sync with the persisted storage;
+    // otherwise the next useAutoSave tick — which reads `history` from
+    // useHistory — would overwrite the just-archived session with stale
+    // data.
     let final = currentSession
     if (currentSession.status === 'IN_PROGRESS') {
       const summary = summarizeSession(currentSession)
       final = completeSession(currentSession, summary)
     }
-    const nextHistory = [...history, final]
-    persistHistory(nextHistory)
     dispatch({ type: 'SET_SESSION', session: null })
     sessionRef.current = null
-    return nextHistory
-  }, [currentSession, history, persistHistory])
+    return final
+  }, [currentSession])
 
   const loadSession = useCallback((session) => {
     if (!session || session.status === 'COMPLETED') return

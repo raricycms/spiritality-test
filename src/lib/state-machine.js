@@ -102,22 +102,27 @@ function replaceRound(session, roundId, patch) {
 }
 
 /**
- * Set a tentative guess; round transitions TARGET_READY -> GUESSING.
- * If a guess is already set, this updates it.
+ * Set or update a tentative guess. Accepts both pre-submit states so the
+ * user can change their selection (or clear it) before committing:
+ *   - TARGET_READY → GUESSING  (first selection)
+ *   - GUESSING     → GUESSING  (changing selection)
+ *   - GUESSING     → TARGET_READY  (clearing the selection)
+ * Any other status throws — once a round is REVEALED or ABANDONED it is
+ * terminal and its guess must not move.
  *
  * @param {import('./schema.js').Session} session
  * @param {string} roundId
- * @param {1|2|3|4|5} guess
+ * @param {1|2|3|4|5|null} guess
  */
 export function previewGuess(session, roundId, guess) {
   const r = session.rounds.find((x) => x.id === roundId)
   if (!r) throw new Error(`previewGuess: round ${roundId} not found`)
-  if (r.status !== 'TARGET_READY') {
+  if (r.status !== 'TARGET_READY' && r.status !== 'GUESSING') {
     throw new Error(`previewGuess: round in status ${r.status}`)
   }
   return replaceRound(session, roundId, {
     guess,
-    status: 'GUESSING',
+    status: guess === null ? 'TARGET_READY' : 'GUESSING',
   })
 }
 
