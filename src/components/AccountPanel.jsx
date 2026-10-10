@@ -4,7 +4,12 @@ import { useI18n } from '../i18n/I18n.jsx'
 import { downloadAccountReport } from '../lib/account-api.js'
 import { buildReportModel } from '../../shared/report-model.js'
 import { analyzeReport } from '../../shared/report-analysis.js'
+import { nekoCopy } from '../../shared/report-copy.js'
 import './AccountPanel.css'
+
+function Paragraphs({ text, className }) {
+  return String(text).split(/\n\s*\n/).filter(Boolean).map((paragraph,index)=><p key={index} className={className}>{paragraph}</p>)
+}
 
 export function AccountBanner({ active, onReport }) {
   const auth = useAccount(), { localize, t } = useI18n(), [error,setError] = useState('')
@@ -24,12 +29,12 @@ export function AccountReport({ onBack }) {
   const pos=(i,r)=>[170+Math.cos(-Math.PI/2+i*Math.PI/2)*r,170+Math.sin(-Math.PI/2+i*Math.PI/2)*r]
   return localize(<section className="account-report">
     <header className="history-header"><h2>灵性探索报告</h2><button className="ghost-btn" onClick={onBack}>返回</button></header>
-    <p className="flow-note">根据本账号记录生成，图表展示测验表现与体验频率，不计算总灵性分。</p>
+    <Paragraphs className="flow-note" text={nekoCopy('report_intro',language==='en')} />
     <button className="primary-btn" disabled={busy} onClick={download}>{busy?'正在生成 PDF…':'导出 PDF 报告'}</button>
     {error && <p role="alert">{error}</p>}
     <div className="report-insights">
-      <article><h3>{analysis.profile.label}</h3><p>{analysis.profile.description}</p><p className="flow-note">{analysis.profile.evidence}</p></article>
-      <article><h3>近期观察与搭档分析</h3><p>{analysis.trends.find(tr=>tr.key==='dses'&&tr.direction!=='insufficient')?.text || analysis.trends.find(tr=>tr.direction!=='insufficient')?.text || '继续累积同组记录，以观察持续变化。'}</p><p>{analysis.partner.text}</p></article>
+      <article><h3>{analysis.profile.label}</h3><Paragraphs text={analysis.profile.description}/><p className="flow-note">{analysis.profile.evidence}</p></article>
+      <article><h3>近期观察与搭档分析</h3><Paragraphs text={analysis.trends.find(tr=>tr.key==='dses'&&tr.direction!=='insufficient')?.text || analysis.trends.find(tr=>tr.direction!=='insufficient')?.text || nekoCopy('recent_pending',language==='en')}/>{analysis.partner.leaders.length>0&&<h4 className="report-partner-names">{analysis.partner.leaders.map(p=>p.label).join(' / ')}</h4>}<Paragraphs text={analysis.partner.text}/></article>
     </div>
     <div className="report-grid">
       <article><h3>各维度雷达图</h3><svg viewBox="0 0 340 340" role="img" aria-label="各维度雷达图">

@@ -19,7 +19,7 @@ it('ranks only adequately sampled account partners and labels the actual match c
   const experiments=[s('a','telepathy',20,12,{sub:'a',username:'Alice'}),s('b','telepathy',10,8,{sub:'b',username:'Bob'}),s('c','telepathy',1,1,{sub:'c',username:'Tiny'})]
   const a=analyzeReport(buildReportModel({experiments},{username:'Me'}),'zh')
   expect(a.partner.leaders.map(p=>p.label)).toEqual(['Bob'])
-  expect(a.partner.detail).toContain('8/10');expect(a.partner.text).toContain('Bob');expect(a.partner.text).not.toContain('Tiny')
+  expect(a.partner.detail).toContain('Bob 8/10');expect(a.partner.detail).not.toContain('Tiny')
 })
 it('provides a multi-dimensional profile only when each experiment has adequate data',()=>{
   const experiments=['hidden','precognition','telepathy'].map(type=>s(type,type,20,10))

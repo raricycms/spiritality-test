@@ -12,6 +12,7 @@ import { Icon } from './components/Icon.jsx'
 import { CandidateSetPicker } from './components/CandidateSymbols.jsx'
 import { AccountProvider, useAccount } from './hooks/useAccount.jsx'
 import { AccountBanner, AccountReport } from './components/AccountPanel.jsx'
+import { nekoCopy } from '../shared/report-copy.js'
 import {
   saveExperimentHistory,
   loadExperimentHistory,
@@ -304,11 +305,19 @@ function AppContent() {
   function renderModuleSelector() {
     return (
       <div className="hero">
-        <div className="hero-emblem" aria-hidden="true"><Icon name="orbit" /></div>
-        <h2 className="hero-title">选择一项实验</h2>
-        <p className="hero-subtitle">
-          分别探索隐藏目标、未来事件、双人感应与日常灵性体验。每项测验独立记录和计分。
-        </p>
+        <div className="neko-welcome">
+          <div className="neko-welcome-copy">
+            <span className="neko-greeting">{language === 'en' ? 'Neko is here!' : 'Neko 来啦！'}</span>
+            <h2 className="hero-title">选择一项实验</h2>
+            <div className="hero-subtitle neko-intro">
+              {nekoCopy('welcome',language === 'en').split('\n\n').map((paragraph,index)=><p key={index}>{paragraph}</p>)}
+            </div>
+          </div>
+          <figure className="neko-portrait">
+            <img src="/images/neko.png" alt={language === 'en' ? 'Neko, the catgirl mascot, with her cat' : '猫娘吉祥物 Neko 和她的小猫'} width="1202" height="1309" />
+            <figcaption>Neko</figcaption>
+          </figure>
+        </div>
         <div className="module-grid">
           {MODULES.map((m) => (
             <div className={`module-card module-${m.type}`} key={m.type}>

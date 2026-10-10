@@ -116,6 +116,65 @@
   line-height: 1.8;
 }
 
+.neko-welcome {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  align-items: center;
+  gap: 34px;
+  width: 100%;
+  text-align: left;
+  padding: 4px 10px 10px;
+}
+
+.neko-greeting {
+  display: inline-block;
+  color: var(--color-accent);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.neko-welcome .hero-title { margin-bottom: 16px; }
+.neko-intro p { margin: 0 0 12px; }
+.neko-intro p:last-child { margin-bottom: 0; }
+
+.neko-portrait {
+  margin: 0;
+  padding: 8px 8px 0;
+  width: 190px;
+  border: 1px solid var(--color-card-border);
+  border-radius: 18px;
+  background: var(--color-accent-soft);
+  box-shadow: 6px 7px 0 var(--color-card-border);
+  transform: rotate(2deg);
+}
+
+.neko-portrait img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 11px;
+  object-fit: contain;
+}
+
+.neko-portrait figcaption {
+  padding: 8px 0;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 620px) {
+  .neko-welcome {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+    padding: 0 0 12px;
+  }
+  .neko-portrait { width: 150px; justify-self: center; }
+  .neko-greeting { margin-bottom: 10px; }
+}
+
 .primary-btn {
   padding: 12px 32px;
   border-radius: 10px;

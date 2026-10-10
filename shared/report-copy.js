@@ -1,90 +1,417 @@
-// Narrative copy is separate from classification rules. Drafted with Claude Code,
-// reviewed to remove population comparisons, invented experiences and causal claims.
+// English was rewritten first with humanize-ai-writing, then translated into
+// short Chinese paragraphs. Each pair keeps the English draft beside its translation.
+const copy = (en, zh) => ({ en, zh })
+const read = (entry, en = false) => entry[en ? 'en' : 'zh'].join('\n\n')
+
 const profiles = {
-  multi: [
-    '你的探索已经从一个问题，展开成了一张有多个入口的地图：独自感知未知、面对尚未发生的结果、与搭档寻找默契，也回到生活里记录自己的体验。这份画像最有意思的地方，是你已经有机会把不同方向放在一起看。接下来可以挑一个最让你想再试一次的方向，保留熟悉的设置继续走，也偶尔回访其他维度。这样留下的记录，会逐渐成为一份更完整的个人探索笔记。',
-    'Your exploration has opened into a map with several entrances: sensing hidden information, choosing before an outcome exists, finding agreement with a partner, and recording everyday experience. You now have something interesting to compare across those directions. Choose the one you most want to revisit, keep familiar settings, and occasionally return to the others. Over time, those observations can become a fuller account of how you explore.'
-  ],
-  early: [
-    '你的探索刚刚打开第一页，眼前还有许多可以尝试的方向。现在最值得留下的，不只是哪一次选中了答案，也包括你是怎样做出选择的：一个念头很快浮现，还是看了几遍才决定？不必一次把所有项目做完，可以从最感兴趣的那个开始，隔一段时间再回访。等这些片段慢慢连起来，你会更容易找到自己想继续探索的地方，这份报告也会逐渐长出属于你的细节。',
-    'Your exploration is opening its first page, with several directions still ahead. Keep track of how a choice arrives as well as whether it matches: a quick impression, or a decision after looking again. You can start with the task that interests you most and return to it later. As those moments connect, the report will gain detail and give you a clearer sense of what you want to explore next.'
-  ],
-  pair: [
-    '在你留下的记录里，双人探索占据了更大的位置。这里的乐趣不只是等待一个答案，而是各自做出选择后，看看两个人的思路会在哪里相遇。你的画像因此更像一张人与人之间的地图，而不只是独自完成的成绩单。接下来可以和熟悉的搭档保留同一组符号、约定好各自独立选择，再试几次；也可以邀请新搭档加入，看看不同组合会写出怎样的共同记录。',
-    'Paired exploration occupies more of your records. Its interest lies in making separate choices and discovering where two paths meet. Your profile is therefore a map of shared exploration as much as a record of individual results. Return to familiar symbols with a regular partner, make choices independently, and try again. You could also invite someone new and see how a different partnership adds another chapter.'
-  ],
-  journal: [
-    '你的记录更多地来自日常体验，而不是屏幕前的一次猜测。这个方向适合慢慢读：同一份问卷放在不同时间填写，会把生活里体验的频率与变化留下来。它的价值在于持续，而不在于某次回答特别高。接下来可以按一个舒服的节奏回访问卷，把最近一段时间作为整体来想，也为自己留下一句当时的近况。久一些之后，这些记录就能勾勒出一条更贴近生活的轨迹。',
-    'Your records lean toward everyday experience rather than on-screen guessing. This direction rewards a slower reading: returning to the same questionnaire preserves how often those experiences appear at different times. Its interest lies in continuity. Revisit it at a comfortable pace, consider the recent period as a whole, and add a personal note about that time if you wish. Together, those entries can form a timeline closer to everyday life.'
-  ],
-  focused: [
-    '你在一个方向上留下了明显更多的记录，探索因此有了自己的重心。重复同一种玩法，让你可以回看它的起伏，也比较不同场次里选择的节奏。下一步不一定要换方向：可以继续沿着这条线走，观察哪些表现会再次出现；也可以偶尔试一试其他项目，给这份集中积累的画像添一个新的角度。深入与拓展都值得，选更能保持你好奇心的那一种即可。',
-    'One direction holds a noticeably larger share of your records, giving your exploration a clear focus. Repeating the same task lets you revisit its ups and downs and compare the pace of your choices. You could follow this thread further and see which patterns return, or occasionally try another task to add a fresh angle. Both depth and breadth offer something useful; choose the path that keeps your curiosity alive.'
-  ],
-  steady: [
-    '你的探索正在几个方向之间逐步展开，还没有只围绕某一项形成固定的路线。这给了你比较不同玩法的空间：独自判断时、面对未来结果时、与搭档配合时，留下的记录可以分别回看。接下来不必同时改变很多条件，先挑一组熟悉的设置保留一段时间。这样，当下一次报告有了变化，你更容易把前后的片段接起来，也更容易决定要往哪个方向继续。',
-    'Your exploration is taking shape across several directions without settling on just one route. This leaves room to revisit individual choices, future outcomes and paired sessions separately. For the next chapter, keep one familiar set of settings for a while rather than changing several things at once. When the report changes, those connected observations will make the difference easier to follow and help you choose where to go next.'
-  ],
+  multi: copy([
+    "You've tried all four directions. Neko can now read your solo choices, paired sessions and everyday experiences side by side. There's plenty to come back to.",
+    "Pick the task you most want to play again. Keep its settings for a few visits, then check another direction when you feel curious. You don't need to finish everything in one day.",
+    "The comparisons are getting interesting: which lines stay steady, and which change? Bring the next session back here and we'll see how it fits with the earlier ones.",
+  ], [
+    '四个方向你都已经试过啦，Neko可以把独自选择、双人默契和日常体验放在一起读。这次有不少地方值得回头看看。',
+    '下次先挑一个最想再玩的项目，保留熟悉的设置试几场。想换口味时再去别的方向逛逛，不用一天把所有项目做完。',
+    '现在可以慢慢比较，哪些线比较平稳，哪些正在变化。等你带着下一场记录回来，我们再看看它和之前有什么不同。',
+  ]),
+  early: copy([
+    "You're on the first few pages. Neko has a handful of observations to read, and several games are still waiting for you. Start with whichever one sounds fun.",
+    "Notice how you choose, too. Does an answer arrive quickly, or do you look again before deciding? You can keep that small detail for yourself after the session.",
+    "Come back when you feel like another round. A few familiar sessions will give us more to talk about and help you find the direction you want to keep exploring.",
+  ], [
+    '你的探索才翻开前几页，Neko已经收到一些小片段，还有几种玩法等着你。先挑最感兴趣的那个，轻轻松松玩起来。',
+    '也可以留意自己怎样选择：答案一下就冒出来，还是看几遍才决定？测完以后，把这个小细节留给自己回味就好。',
+    '想玩的时候再回来试几场，熟悉的记录多一些，我们就有更多话可聊。你也会更容易找到自己想继续探索的方向。',
+  ]),
+  pair: copy([
+    "Paired sessions take up more of your record. You seem to enjoy putting two separate choices together and checking where they meet. Neko has a partner map to read here.",
+    "Invite a familiar partner back with the same symbols. Choose independently, then talk after the reveal. Those repeat visits give each pairing something to compare.",
+    "You can swap sender and receiver, too. Or invite someone new when you're curious. Keep the settings clear so you can read each partnership's sessions together later.",
+  ], [
+    '你的记录里，双人玩法占了更大的位置。两个人各自选好，再看答案会不会碰到一起，Neko也很想跟着看揭晓呢。',
+    '下次可以约熟悉的搭档，用同一组符号再试几场。先各自独立选择，揭晓之后再聊天，这样就有前后能比较的记录啦。',
+    '也可以交换发送者和接收者，或者邀请新朋友加入。记清楚每次的设置，以后翻回来，就能分别读读每种组合的故事。',
+  ]),
+  journal: copy([
+    "Your record has more everyday experience in it. Neko can follow what you've reported across questionnaires, so this part of the report moves at the pace of ordinary life.",
+    "Return to the questionnaire when the timing feels comfortable. Think about the recent period as a whole; a quiet day or an eventful day doesn't have to speak for every day.",
+    "Keep your earlier entries beside the new ones. Later you'll be able to see which feelings became more frequent and which stayed much the same. There's no rush to fill the timeline.",
+  ], [
+    '你的记录更多来自日常体验，Neko会跟着问卷看看这些感受怎样变化。这一部分慢慢读就好，节奏可以跟着生活走。',
+    '下次填问卷时，想想最近一段时间的整体感受。安静的一天或特别热闹的一天，都不用替所有日子回答，照实选就好。',
+    '把旧问卷和新问卷留在一起，以后就能看看哪些感受更常出现，哪些大体相似。时间线慢慢补，不急着一下填满喵。',
+  ]),
+  focused: copy([
+    "One game holds most of your observations. You've given it enough attention for Neko to follow its ups and downs across sessions. That's a clear place to return to.",
+    "Keep the familiar symbols for another visit and notice how you make each choice. If you'd like a new approach, change one thing at a time so the sessions remain easy to compare.",
+    "You can stay with this game or try a different one for a fresh angle. Choose what you actually want to play next; the report will keep both kinds of visits for you.",
+  ], [
+    '你在一种玩法里留下了明显更多的记录，探索有了自己的重心。Neko可以沿着这条线，陪你看看不同场次的起伏。',
+    '下次保留熟悉的符号，再留意自己每轮怎样决定。想换一种做法也行，一次只改一件事，前后的记录会更容易比较。',
+    '继续玩这一项，或去别的项目尝尝鲜，都由你来选。挑真正让你想再试一次的方向，Neko会帮你把记录好好留下。',
+  ]),
+  steady: copy([
+    "Your visits are spread across several games. You haven't settled on one route, which gives Neko different kinds of sessions to read separately. Keep following what interests you.",
+    "For the next few visits, choose one familiar set of settings. You can then compare sessions without having to untangle several changes at once. The other games can wait a little.",
+    "When you return, we'll look at what changed and what stayed familiar. That can help you choose your next game without turning every session into a target to beat.",
+  ], [
+    '你正在几个玩法之间慢慢探索，还没有只沿着一条路线走。Neko会把不同方向分别读，看看每种玩法留下了什么。',
+    '接下来可以先保留一组熟悉的设置，连着试几场。这样前后更容易比较，也不用一次弄清好多变化，其他项目稍后再玩。',
+    '等你再回来，我们一起看看哪些地方变了，哪些还是熟悉的样子。下一场想玩什么，可以照着兴趣选，不用追着成绩跑。',
+  ]),
 }
 
-const dimensionCopy = {
+const dimensions = {
   hidden: {
-    above: ['感知亮点','Perception highlights','隐藏信息这一项，已经出现了值得回访的亮点：你的选择与隐藏答案对上的时候，比参考线所对应的比例更多。下一次可以留意，自己是先看到某个选项就决定，还是在几个选项之间反复游移。把做法保留下来，再回到同一组符号里试一试。比起追逐某一次特别亮眼的结果，你现在更值得探索的是，这种表现能否在之后的记录中再次出现。','Hidden information offers a highlight worth revisiting: your choices matched the hidden answer more often than the reference proportion. Next time, notice whether one option comes to mind first or you move between several. Keep that approach and return to the same symbols. The interesting next question is whether the pattern returns in later sessions.'],
-    near: ['平稳探索','Steady exploration','在隐藏信息这一项里，命中与错过交错出现，整体还没有明显偏向哪一边。这让下一次探索有了一个很具体的入口：回看自己什么时候决定得干脆，什么时候犹豫得更久。可以先保持同一种做法，而不是每轮都另找技巧。让相同设置下的记录多留下一些，你会更容易看清这条线究竟会继续平稳，还是慢慢出现新的方向。','Matches and misses are interspersed in hidden-information trials, with no clear departure from the reference. That gives you a concrete next step: notice when a decision feels immediate and when it takes longer. Keep one approach instead of finding a new technique every round. More sessions with the same settings will show whether this line stays steady or develops a new direction.'],
-    below: ['换个节奏再试','Try a fresh pace','这一段隐藏信息记录里，选中的答案偏少，眼下还没有出现突出的感知亮点。与其盯着已经结束的几轮，不如给下一次留一个简单的变化：选一个不赶时间的时刻，用同样的符号再完成一场。你也可以比较自己快速决定和稍作停顿时的做法，但一次只调整一件事。让这项探索成为可以继续回访的问题，而不是一场结束就关上的门。','This chapter contains fewer matches in hidden-information trials and no clear highlight yet. Give the next session one simple change: a time when you can work without rushing, using the same symbols. You could also compare quick choices with a short pause, changing one thing at a time. Keep this direction open as a question you can revisit.'],
+    above: ['感知亮点', 'Perception highlights', copy([
+      "Your hidden-information choices matched more often than the reference line. Neko would put a bookmark here: this is one part of the record worth returning to.",
+      "Next time, notice whether an option arrives at once or you move between several. Keep the same symbols and finish the session before looking back at how you chose.",
+      "Bring a few more sessions to this page. We can then see whether those extra matches show up again or were concentrated in one visit. There's a specific question to follow now.",
+    ], [
+      '隐藏信息这一项，你和答案对上的时候比参考线更多。Neko先替你夹个小书签，这里值得下次回来再仔细看看。',
+      '下次留意答案是一下冒出来，还是在几个选项间来回想。保留同一组符号，完整做完以后，再回看自己选择时的节奏。',
+      '多带几场记录回来，我们就能看看这些亮点有没有再次出现，还是集中在某一场。现在有一个具体的小问题可以追啦。',
+    ])],
+    near: ['平稳探索', 'Steady exploration', copy([
+      "Your matches are close to the reference line in hidden-information trials. This part of the record is fairly steady, so Neko would keep it as a starting point for the next visit.",
+      "Try one familiar approach for a full session. Notice which choices feel quick and which need another look. You can revisit those differences after the answers are revealed.",
+      "More sessions with the same settings will show whether this line stays near its current level or moves. A steady page is useful when you later want to compare a change.",
+    ], [
+      '隐藏信息的命中比例目前靠近参考线，这一段比较平稳。Neko会把它先留在这里，给下一次回访做个熟悉的起点。',
+      '先用一种熟悉的做法完整玩一场，留意哪些选择很快，哪些要再看一眼。等答案揭晓以后，再慢慢回味这些小差别。',
+      '同样设置下再多玩几场，就能看看这条线会保持现在的水平，还是有所变化。以后想比较时，这段平稳记录也用得上。',
+    ])],
+    below: ['换个节奏再试', 'Try a fresh pace', copy([
+      "There are fewer matches in this hidden-information chapter. Neko would give the next session a simple starting point: familiar symbols and enough time to finish comfortably.",
+      "If you'd like to try a different pace, change one thing. You could pause briefly before choosing while keeping the symbols and session length. Then review the complete record.",
+      "Keep this visit beside the next one, including the choices that missed. Having both pages will let you see what actually changed when you try the game again.",
+    ], [
+      '这段隐藏信息记录里，和答案对上的时候少了一些。下次用熟悉的符号，找个不赶时间的时刻，轻松完成一场就好。',
+      '想试试新节奏的话，可以选择前稍作停顿，其他设置先保留。一次改一件小事，做完以后再回看整场，会比较清楚。',
+      '把这一场和下一场都留着，没选中的回合也一起留下。等你再玩回来，Neko就能陪你看看前后到底有哪些变化啦。',
+    ])],
   },
   precognition: {
-    above: ['预知亮点','Precognition highlights','在答案尚未生成时做出的选择，已经留下了一段较多与后来结果对上的记录。这是未来预知这一项里最值得回看的地方。接下来可以在提交选择前，留意那个决定是怎样出现的，然后保持熟悉的方式继续测试。每一场完整记录，都会为这段探索添上前后文；当你再次翻到这页，就能看见这些亮点是零散出现，还是逐渐连成一条线。','Choices made before the answer existed have produced a chapter with more matches to the later outcome. That is the highlight to revisit in this direction. Notice how a decision arrives before you submit it, then continue with a familiar approach. Each complete session adds context, helping you see whether these moments remain scattered or recur across the timeline.'],
-    near: ['平稳探索','Steady exploration','未来预知的记录目前呈现出一条比较平稳的线，有对上的时刻，也有没有对上的时刻。这个方向的特别之处，是你必须先留下选择，再等待答案出现。可以把这种先选后看的顺序，变成一个熟悉的小练习：做出决定、保留记录、再看结果。继续几次之后，报告就能把分散的片段连起来，让你更容易读懂自己在这个方向上的变化。','Your precognition records are fairly steady, with both matches and misses. This task asks you to leave a choice before the answer appears. Make that sequence a familiar exercise: decide, preserve the choice, then see the outcome. More sessions will connect the separate moments and make changes in this direction easier to follow.'],
-    below: ['重新寻找节奏','Find your pace again','这一段未来预知记录里，猜测与之后答案对上的时候较少。下一次可以先把目标放得简单一点：完整完成一场，按同样的方式做出每个选择，再统一回看结果。也可以换到一个更方便专心的时段，不过先保留其他设置。这样，新记录既是一场新的尝试，也能和今天这一页放在一起读，让你看到前后究竟有什么变化。','This chapter has fewer matches between your choices and the later answers. For the next session, set a simple aim: finish the whole task, use a consistent approach, and review it afterward. You might choose a time when concentrating is easier while keeping other settings. The new session will then be both a fresh attempt and something you can read beside this one.'],
+    above: ['预知亮点', 'Precognition highlights', copy([
+      "You chose before the answers existed, and this chapter contains more matches to the later results. Neko has a bookmark for this line too. It's worth another visit.",
+      "Notice how you reach a choice before submitting it. Keep a familiar approach for the whole session, then compare it with this one after all the results have appeared.",
+      "Each finished session will give these matches more context. We'll be able to see whether they recur across visits or belong mainly to this chapter. Keep the question open for next time.",
+    ], [
+      '你先做出选择，再等答案生成，这一段和后来结果对上的时候更多。Neko也给这里夹个书签，下次可以继续回访。',
+      '提交之前，可以留意那个决定是怎样出现的。整场先用熟悉的做法，等结果全部揭晓以后，再和今天这份记录一起看。',
+      '每次完整做完，都能给这些亮点添一点前后文。我们就能看看它们会不会再次出现，还是主要留在这一段记录里面。',
+    ])],
+    near: ['平稳探索', 'Steady exploration', copy([
+      "Your choices and later answers match at a fairly steady rate near the reference line. This game has a simple rhythm: choose first, then wait to see what appears.",
+      "Keep that rhythm for another complete session. Let each choice stand once you've submitted it, and review after the reveal. Neko can read the whole visit with you afterward.",
+      "A few more visits will connect these separate results. Then you can see whether the line stays steady or takes a new direction, with today's record still there to compare.",
+    ], [
+      '你的选择和后来答案对上的比例靠近参考线，目前比较平稳。这项玩法的节奏很简单：先选好，再等结果慢慢揭晓。',
+      '下次也按这个顺序完整玩一场，提交以后就让选择留在那里。等揭晓后再回看，Neko会陪你读读整场留下的记录。',
+      '再回来几次，分散的结果就能接成一条线。它会继续平稳还是换个方向，到时可以把新记录和今天这一页放在一起看。',
+    ])],
+    below: ['重新寻找节奏', 'Find your pace again', copy([
+      "Your choices matched the later answers less often in this chapter. For the next visit, Neko would set one easy aim: finish a whole session at a pace that feels comfortable.",
+      "Use the same symbols and keep your approach consistent. If a different time of day suits you better, try that while leaving the other settings alone. Review after you've finished.",
+      "Keep both visits in the report. That gives you something concrete to compare the next time you return, including the rounds that didn't go the way you hoped.",
+    ], [
+      '这一段里，你的选择与后来答案对上的时候偏少。下一场先给自己一个简单目标，用舒服的节奏把整场完整做完喵。',
+      '符号和做法先保持熟悉，想换到更方便专心的时段也可以。其他设置暂时保留，做完再一起看结果，比较起来更清楚。',
+      '前后两场都留在报告里，没有选中的回合也留着。这样下次回来，就有具体的记录可以比较，看看哪些地方发生变化。',
+    ])],
   },
   telepathy: {
-    above: ['默契逐渐显现','Shared choices stand out','你的双人记录里，相同的选择占据了更大的部分，已经留下不少“原来你也选了这个”的时刻。这个方向值得继续沿着搭档关系去探索：和同一个人再试几次，保留符号与流程，各自独立完成选择。你们可以在揭晓之后聊聊做出决定时的想法，让下一场有一个共同的回忆，也看看熟悉的组合会不会继续带来相遇的选择。','Shared choices occupy a larger part of your paired records, leaving many moments of finding the same answer. Follow this direction through the partnership: return with the same person, symbols and process, making choices independently. After the reveal, you can discuss how you decided and see whether the familiar pairing continues to bring your choices together.'],
-    below: ['默契仍在展开','Agreement is taking shape','你和搭档的选择更多地走向了不同的答案，相遇的时刻还没有占到多数。这段记录可以成为你们下一次探索的起点：保留同一组符号，让发送者先确定选择，接收者再独立判断。揭晓之后，也可以聊聊各自为什么想到那个选项。把共同记录多留几场，你们的关系图就会从一根线，慢慢变成一段可以回看的双人探索经历。','You and your partner chose different answers more often than the same ones. Use this chapter as a starting point: keep the symbols, let the sender settle on a choice, and have the receiver decide independently. Afterward, talk about what drew each of you to an option. More shared sessions will give this connection a story you can revisit.'],
+    above: ['默契逐渐显现', 'Shared choices stand out', copy([
+      "Matching choices take up at least half of your paired record. Neko can point to rounds where you met at the same answer. This pairing is worth revisiting.",
+      "Invite the same partner back with familiar symbols. Let the sender settle on a choice and the receiver choose independently, then talk after the reveal about what came to mind.",
+      "You can swap roles for another session, too. Keep those shared visits together and we'll see whether matching choices keep appearing across the two ways of playing.",
+    ], [
+      '你的双人记录里，相同选择已经占到至少一半，留下不少碰到同一个答案的回合。Neko想继续看看这份默契呢。',
+      '下次约同一位搭档，用熟悉的符号再玩。发送者先定好，接收者独立选择，等揭晓之后，再聊聊当时想到了什么。',
+      '也可以交换角色再完成一场，把共同记录留在一起。我们就能看看换个方向玩时，相遇的选择会不会继续出现在里面。',
+    ])],
+    below: ['默契仍在展开', 'Agreement is taking shape', copy([
+      "Different choices take up more of your paired record so far. Neko would keep this as the first part of your shared story and give the same pairing another visit.",
+      "Keep the symbols familiar. The sender chooses first, and the receiver decides independently. After the reveal, you can talk about what drew each of you to your option.",
+      "A few more sessions will give the connection more detail. Swapping roles can add another view, while repeating the settings lets you compare how this pairing develops.",
+    ], [
+      '你和搭档目前更多时候选了不同答案，相遇的选择还没有占到多数。Neko先留好这一页，下次可以接着写双人故事。',
+      '保留熟悉的符号，发送者先选择，接收者再独立判断。等答案揭晓之后，你们可以聊聊为什么会想到各自那个选项。',
+      '共同记录多留几场，这条连线就会有更多细节。交换角色也可以添一个视角，相同设置方便你们回头比较前后的变化。',
+    ])],
   },
   dses: {
-    above: ['日常体验丰富','Frequent everyday experience','你在问卷中报告的日常灵性体验较为频繁，这份画像因此有了一个贴近生活的部分。问卷把不同体验放在同一个方向里，而你可以用自己的话为它补上细节：最近哪些时刻让你想停下来，觉得有意义，或与周围更有连接？不需要为了记录而制造特别的经历，按平常的生活继续，隔一段时间再回访问卷，就能看到这条生活线如何变化。','You report frequent daily spiritual experience, giving the profile a direction close to everyday life. You can add your own detail by considering moments that felt meaningful or connected. There is no need to create a special experience for the record. Continue with ordinary life and return to the questionnaire later to see how this part of the timeline develops.'],
-    near: ['体验间歇出现','Experience comes in moments','这些体验在你的回答里有所出现，但并不是日常里随时都在的感受。这样的记录适合慢慢积累，而不必寻找某一个特别突出的瞬间。你可以在下一次填问卷时，回想最近一段时间的整体体验，也为自己留下一句简单的近况。日子往前走，几次问卷放在一起，会把那些零散的感受连成一条更容易回顾的生活轨迹。','These experiences appear in your answers from time to time. Let the record grow gradually rather than looking for one especially striking moment. When you return to the questionnaire, consider the recent period as a whole and, if useful, leave a brief personal note about it. Together, several entries will connect those moments into a timeline that is easier to revisit.'],
-    below: ['安静的体验阶段','A quieter chapter','问卷里，你报告的这类体验出现得较少，因此这一部分的画像显得比较安静。你可以先把现在这一页当作自己的起点，之后按舒服的节奏再回来填写。回想体验时，用自己熟悉的语言即可，不必为了选项寻找特殊含义。如果生活里出现了想留下的片刻，可以先记住它；未来的问卷会让你看见，这段安静的记录有没有慢慢发生变化。','You report these experiences less often, giving this part of the profile a quieter character. Let this page serve as a starting point and return at a comfortable pace. Use your own familiar understanding of the experiences rather than searching for a special meaning in each option. If a moment feels worth remembering, keep it; future entries will show how this quieter chapter develops.'],
+    above: ['日常体验丰富', 'Frequent everyday experience', copy([
+      "Your questionnaire reports these daily experiences quite often. Neko reads this page as a part of your everyday life, and you can give those answers your own familiar meaning.",
+      "When you return, think about the recent period as a whole. You might recall moments that felt meaningful or connected, without needing to find something special every day.",
+      "Keep living at your usual pace and fill in the questionnaire again when you want to. Several visits will let you see whether these experiences stay frequent or change over time.",
+    ], [
+      '问卷里，你报告的这些日常体验比较频繁。Neko会把这一页放进生活的部分，用你熟悉的理解，慢慢读这些回答。',
+      '下次可以回想最近一段时间，哪些片刻让你觉得有意义，或和周围有所连接。照着整体感受选，不用每天寻找特别经历。',
+      '按平常的节奏生活，想记录时再回来填一份。几次问卷放在一起，就能看看这些体验一直很频繁，还是慢慢有了变化。',
+    ])],
+    near: ['体验间歇出现', 'Experience comes in moments', copy([
+      "These experiences appear in your answers from time to time. Neko would let this page grow at an ordinary pace; there's no need to search for one striking moment to explain it.",
+      "At the next visit, consider the recent period as a whole. Use your own understanding of the questions and choose what fits. A brief quiet patch can stay in the record too.",
+      "Several questionnaires will give those separate moments a timeline. You can then look back at which experiences became more frequent and which kept a similar pace.",
+    ], [
+      '这些体验在你的回答里时不时出现，日常中有一些这样的片刻。Neko觉得可以慢慢记录，不用急着找最特别的一次。',
+      '下次想想最近一段时间的整体感受，按自己的理解选合适的回答。偶尔安静一点也照实留下，记录可以跟着日子走。',
+      '几份问卷放在一起，零散的感受就有了时间顺序。以后回看，可以慢慢分辨哪些体验更常出现，哪些还是相近的节奏。',
+    ])],
+    below: ['安静的体验阶段', 'A quieter chapter', copy([
+      "You report these experiences less often in the questionnaire. Neko would keep this quiet page as your starting point and leave room for whatever you report on a later visit.",
+      "Use the meanings that feel familiar to you. You don't have to search for something unusual to fit an option. Think about the recent period, then choose the answer that fits.",
+      "Come back at a comfortable pace. Keeping this questionnaire beside the next one will let you see whether this quieter chapter changes or stays much the same.",
+    ], [
+      '问卷里，你报告的这类体验出现得较少，这一页比较安静。Neko先把它留作起点，等你下次回来，再一起看看变化。',
+      '用自己熟悉的意思理解问题就好，不用替选项寻找特殊含义。想想最近一段时间的整体感受，选贴近自己的那个回答。',
+      '以后按舒服的节奏回来填写，把今天和下一份问卷放在一起。到时就能看看这段安静的记录有了变化，还是大体相似。',
+    ])],
   },
 }
 
-export const profileCopy=(key,en)=>profiles[key][en?1:0]
-export function dimensionNarrative(key,tier,en){const copy=dimensionCopy[key][tier];return {verdict:copy[en?1:0],text:copy[en?3:2]}}
-export function trendNarrative(d,direction,en){
-  const daily=d.key==='dses',paired=d.key==='telepathy'
-  const zh=daily?{
-    up:'你的日常灵性体验近期更频繁了。把前后的问卷连起来看，这一方向正往上走，为你的探索添了一段向上的生活轨迹。接下来可以继续按熟悉的节奏填写，也留意哪些时刻让你愿意停下来、觉得有意义或有所连接。无需要求每天都有特别的感受，让记录跟着日子往前走，就能看到这段变化会怎样延续。',
-    stable:'你的日常灵性体验近期保持在相近的水平，前后问卷之间没有明显的转折。这让时间线有了一段平稳的章节，也给下一次回访留下了熟悉的参照。继续用同样的方式回想最近的生活即可，不必刻意寻找变化。以后再翻回这页，你就能把新的感受放在这段平稳的记录旁边，看看哪些地方仍然相似，哪些悄悄不同。',
-    down:'你的日常灵性体验近期比之前少了一些，时间线正在经过一段更安静的章节。可以先把这个变化留下来，不急着寻找一个原因；下一次填写时，依然回想最近一段时间的整体感受。也许后面的记录会重新向上，也许会维持现在的节奏。让每一段都留在同一条线上，报告才能更完整地呈现属于你的生活变化。',
-  }:{
-    up:`你的${d.label}近期正在上升。把同样设置下的记录前后接起来，最近这一段${paired?'选择相同的时刻更多了':'与答案对上的时刻更多了'}，是值得继续回访的变化。下一次先保留现在的符号与流程，${paired?'和搭档各自独立选择，再一起看揭晓':'按熟悉的方式完成选择，再统一回看结果'}。你可以带着好奇继续，看看这条向上的线会怎样展开，而不必每一次都要求自己超过上一场。`,
-    stable:`你的${d.label}近期没有明显的上升或回落，记录大体保持在相近的水平。这一段平稳的轨迹，适合当作下一次探索的参照。可以先保留相同设置再试几场，也可以一次只调整一件小事，看看后续记录是否出现新的方向。平稳的线同样值得留下：它让你以后看到变化时，有一段可以放在旁边比较的历史。`,
-    down:`你的${d.label}近期有所回落，最近这一段${paired?'相同选择':'命中答案'}比之前少了些。先把这段曲线完整留下，给下一次尝试一个轻松的起点：使用熟悉的设置，完整做完，再回头看。你也可以留意测试时的节奏，不过无需马上替结果找一个解释。接下来几场会继续为这条线补上前后文，让你看见它会回升、持平，还是展开另一段变化。`,
-  }
-  const english=daily?{
-    up:'Your daily spiritual experience is becoming more frequent. Earlier and recent questionnaires form an upward chapter in this part of your story. Continue at a familiar pace, noticing moments you find meaningful or connected. You do not need a special experience every day; let the record follow ordinary life and see how this change develops.',
-    stable:'Your daily spiritual experience has stayed at a similar level recently, with no marked turn between earlier and later questionnaires. This gives the timeline a steady chapter and a familiar reference for the next visit. Keep considering the recent period in the same way. Later entries will let you see what remains familiar and what has changed.',
-    down:'Your daily spiritual experience is less frequent recently, giving the timeline a quieter chapter. Preserve that change without needing an immediate explanation. At the next visit, consider the recent period as a whole again. Future entries may rise or keep this pace; retaining every chapter gives your everyday timeline a fuller story.',
-  }:{
-    up:`Your ${d.label.toLowerCase()} is rising recently. With the same settings, the later chapter contains more ${paired?'shared choices':'matches to the answer'}. Keep the current symbols and process for another session, then review it afterward. Follow the upward line with curiosity rather than asking every session to exceed the last one.`,
-    stable:`Your ${d.label.toLowerCase()} has stayed fairly steady recently. Keep this chapter as a reference for your next visit. You can repeat the same settings or change one small thing at a time and see where later observations lead. A steady line is worth preserving because it gives future changes something concrete to sit beside.`,
-    down:`Your ${d.label.toLowerCase()} is lower recently, with fewer ${paired?'shared choices':'matches'} in this chapter. Keep the curve intact and give the next session a relaxed starting point: familiar settings, a complete session, then a review. You can notice your pace without deciding on a cause. More sessions will show how this part of the timeline unfolds.`,
-  }
-  return (en?english:zh)[direction]
+const dailyTrends = {
+  up: copy([
+    "Your daily spiritual experience is more frequent recently. Neko can see the newer questionnaires sitting above the earlier ones. This part of your record has an upward turn.",
+    "Keep answering with the recent period in mind. Notice moments you want to remember, and let ordinary days stay ordinary. You don't have to find a special feeling every day.",
+    "Return when you feel ready for another entry. The next questionnaire will let us see how this change continues, with the earlier answers still beside it for comparison.",
+  ], [
+    '你的日常灵性体验近期更频繁了，最近的问卷比早一些的记录更高。Neko看到这条生活线往上走，想陪你接着看看。',
+    '继续按最近一段时间的整体感受填写，遇到想记住的片刻可以留意一下。普通日子照常过，不用每天都找特别的感受。',
+    '想记录时再回来填一份，我们就能看看这段变化接下来怎样延续。旧回答也会好好留着，方便你把前后的体验一起读。',
+  ]),
+  stable: copy([
+    "Your daily spiritual experience has stayed at a similar level recently. Neko reads this as a steady stretch of your timeline, with no large change between the two periods.",
+    "Keep thinking about the recent period in the same way. Familiar feelings can stay on the page without needing a dramatic event to make the record worth keeping.",
+    "When you return, put the new answers beside these ones. You can see what still feels familiar and what changed, using this steady stretch as a reference.",
+  ], [
+    '你的日常灵性体验近期保持在相近水平，前后问卷没有明显转折。Neko会留好这一段平稳的生活线，等你下次回来。',
+    '继续用熟悉的方式回想最近一段时间就好，平常的感受也可以照实留下。日子不需要发生大事，记录一样有东西可读。',
+    '以后把新回答放在这几份问卷旁边，就能看看哪些感受还是熟悉的，哪些悄悄变了。这段平稳记录会是方便的参照。',
+  ]),
+  down: copy([
+    "Your daily spiritual experience is less frequent recently. The newer questionnaires form a quieter stretch than the earlier ones. Neko would keep both parts of the timeline.",
+    "At the next visit, consider the recent period as a whole again. You can let this change stay on the page without finding an immediate explanation for it.",
+    "Later answers will show whether the line rises again or keeps this pace. Keep each entry so the next report can read the whole sequence with you.",
+  ], [
+    '你的日常灵性体验近期比之前少了一些，新的问卷留下了更安静的一段。Neko会把前后都留好，让生活线完整一些。',
+    '下次填写时，依然回想最近一段时间的整体感受。先让这个变化留在纸上，不急着替它找原因，按自己的真实感受选。',
+    '后面的回答会告诉我们，这条线会再次往上，还是维持现在的节奏。每份都留着，下次就能一起读读完整的变化啦。',
+  ]),
 }
 
-export function partnerNarrative(names,leaderCount,candidateCount,en){
-  if(!leaderCount)return en?'Your partner story is waiting for more shared observations. Invite someone to try the task, agree on symbols and process, choose independently, and see the reveal together. Return with an existing partner too, giving each pairing a timeline. As those sessions accumulate, the report can identify the pairing with the most agreement and add detail to your relationship map.':'你的搭档故事还在等待更多共同记录。现在可以邀请一个愿意一起尝试的人，约定好符号与流程，各自独立做出选择，再一起看揭晓。也可以和已经测过的搭档再完成几场，让同一种组合有前后可以回看的片段。等这些共同经历积累起来，报告就会为你指出目前最有默契的搭档，关系图也会长出更多细节。'
-  if(leaderCount>1)return en?`Your leading agreement partners are currently tied: ${names}. These pairings have left the same proportion of shared choices, giving the map more than one connection worth revisiting. Return with each partner, keeping the symbols and process and choosing independently. Explore how each pairing develops its own chapter.`:`与你最有默契的搭档，目前并列的是 ${names}。你们的共同记录，留下了相近比例的相同选择，也让关系图出现了不止一条值得回访的线。下一次可以分别和这些搭档继续，保留相同符号与流程，各自独立选择。比起急着分出第一名，更有意思的是看看每一种组合，会写出怎样不同的双人探索经历。`
-  return en?`Your leading agreement partner is currently ${names}. Among comparable pairings, you share the highest proportion of matching choices, making this a connection worth revisiting. ${candidateCount===1?'This is also the only pairing with enough comparable records so far.':'You can return to this pairing and revisit others as well.'} Keep familiar symbols, choose independently, and wait for the reveal together to add another chapter.`:`与你最有默契的搭档，目前是 ${names}。在可以比较的共同记录中，你们选择相同答案的比例最高，这条连线因此成了关系图里值得回访的一条。${candidateCount===1?'你们也是目前唯一积累了足够可比较记录的组合，可以继续把这段共同经历写得更完整。':'你可以再和这位搭档完成几场，也回访其他组合，看看这些关系会怎样继续展开。'}下一次保留熟悉的符号，各自做出选择，再一起等待揭晓，让这份默契留下新的片段。`
+const experimentTrends = {
+  up: copy([
+    "This direction is rising recently. With the same settings, later sessions contain more matches than the earlier ones. Neko would keep this turn marked for your next visit.",
+    "Keep the symbols and process familiar for another session. Finish it before reviewing the result, then put the complete record beside these earlier visits.",
+    "You can follow the change with curiosity. Each session can have its own result; the next few visits will show whether this upward stretch continues or changes pace.",
+  ], [
+    '这一方向近期正在上升，同样设置下，最近和答案对上的时候更多了。Neko先标记好这个转折，等你下次回来继续看。',
+    '下一场保留熟悉的符号与流程，完整做完以后再回看结果。把整场记录放在之前的几场旁边，前后的变化会更容易读。',
+    '带着好奇接着玩就好，每一场都可以有自己的结果。再回来几次，我们会看见这段上升继续延伸，还是慢慢换了节奏。',
+  ]),
+  stable: copy([
+    "This direction has stayed near the same level recently. Neko can keep this steady stretch as a reference when you return with another session using familiar settings.",
+    "Repeat the current approach if you're comfortable with it. If you want to try something different, change one small thing and leave the other settings as they are.",
+    "Keep the full session each time. Then a later change will have earlier visits to sit beside, and we can read where the line moved and where it stayed familiar.",
+  ], [
+    '这一方向近期没有明显上升或回落，记录大体停在相近的水平。Neko会把这段平稳的线留下，给下次回访做个参照。',
+    '用现在的做法再玩几场也行，想试一点变化也可以。一次调整一件小事，其他设置先保留，这样比较时会更清楚些。',
+    '每次都留完整记录，以后有了变化，就能放在这几场旁边看。我们可以慢慢读出哪里动了，哪里还是熟悉的样子。',
+  ]),
+  down: copy([
+    "This direction is lower recently, with fewer matches in the newer sessions. Neko would keep this part of the curve and give the next visit a comfortable starting point.",
+    "Use familiar settings and finish the whole session. You can notice your pace as you choose, then review afterward without needing to explain every missed answer.",
+    "A few more sessions will add context to this dip. We'll see whether the curve comes back up, holds steady, or changes again, with this chapter still in the report.",
+  ], [
+    '这一方向近期有所回落，新的几场和答案对上的时候少了些。Neko会留好这段曲线，下一场从舒服的节奏重新开始。',
+    '用熟悉的设置完整做完一场，顺便留意自己选择时的节奏。等结束再回看就好，不用替每个没选中的答案马上找解释。',
+    '再多几场记录，这段回落就有了前后文。我们会看见曲线重新向上、保持平稳，或有别的变化，今天这一页也会留着。',
+  ]),
 }
 
-export function synthesisNarrative(trends,en){
-  const up=trends.filter(r=>r.direction==='up'),down=trends.filter(r=>r.direction==='down'),stable=trends.filter(r=>r.direction==='stable'),names=arr=>arr.map(r=>r.label).join(en?', ':'、')
-  if(up.length&&down.length)return en?`Your profile contains changes in different directions: ${names(up)} is rising, while ${names(down)} is lower recently. Read those paths separately. Keep familiar settings in each and see where the next chapter leads. Preserving both directions gives you a fuller story and more specific questions to revisit.`:`你的画像里出现了不同步的变化：${names(up)}在上升，${names(down)}则有所回落。把这些方向分开读，比用一句“变强了”或“变弱了”概括更贴近这段记录。下一次可以各自保留相同的设置，继续看看两条线会往哪里走。这份报告有意思的地方，正是它让不同侧面的变化同时留在纸上，为你留下更多可以回访的问题。`
-  if(up.length>=2)return en?`Several directions are rising recently: ${names(up)}. Preserve this upward chapter and the approaches you used. Keep familiar settings and return without asking every session to set a new high. The next report will show whether these lines extend or begin to turn.`:`你的${names(up)}都在近期往上走，多个方向一起为这份画像添上了向上的线条。这段变化值得好好留下：可以回想最近采用的做法，也继续保留现在熟悉的设置。接下来不用要求每一场都再创新高，完整完成、持续回访就好。等下一份报告生成，你会有机会看见这些向上的轨迹，是继续延伸，还是在某处慢慢转了弯。`
-  if(stable.length>=2&&!up.length&&!down.length)return en?'Several directions are fairly steady recently, without a marked turn between earlier and later records. This chapter gives you a familiar reference for future changes. Continue at the same pace, or choose one direction and adjust one thing at a time. Let the record follow your exploration naturally rather than pursuing a dramatic curve.':'你的几个探索方向近期都比较平稳，前后的记录没有出现明显转折。这样的画像同样有可读的内容：它为你留下了一段熟悉的参照，以后有了新的变化，就能把两段记录放在一起看。接下来可以继续保持节奏，也可以选择一个最感兴趣的方向，一次只调整一件事。无需为了让图形好看而追求起伏，让记录跟着你的探索自然展开。'
-  if(up.length||down.length){const r=up[0]||down[0];return en?`One line stands out recently: ${r.label}, which is ${r.direction==='up'?'rising':'lower than before'}. Other directions are steady or need more connected records. Follow this changing line while gradually adding observations elsewhere. The next report can then revisit today's question and offer new angles for comparison.`:`这份画像里，${r.label}是近期较值得留意的一条线，它正在${r.direction==='up'?'向上延伸':'经历回落'}。其他方向${stable.length?'有些保持平稳，有些还需要更多记录':'仍需要更多连续记录来接上时间线'}。你可以先沿着这条已经有变化的线继续走，同时为其他维度慢慢补上内容。这样，下一份报告既能回应现在留下的问题，也会带来新的比较角度。`}
-  return en?'Your profile is a map still unfolding. Completed tasks have given it outlines, while changes over time and partnerships need more detail. Choose the direction you most want to revisit rather than filling every open space at once. Another session with familiar settings, or a return to the questionnaire, will make this map more specific and help you choose a next step.':'现在这份画像更像一张正在展开的地图。已经完成的项目给你留下了第一批轮廓，而连续变化与搭档关系，还需要后面的记录来补上细节。可以先挑一个最想回访的方向，不急着把每个空白都填满。用熟悉的设置再完成一场，或者回到问卷里看看最近的生活体验；下一份记录会让这张地图更具体一点，也让你更容易决定接下来往哪里走。'
+const partners = {
+  empty: copy([
+    "Your partner story needs a few more shared sessions before Neko can pick out a leading pairing. Invite someone you'd like to play with, or revisit an existing partner.",
+    "Agree on the symbols, then make your choices independently. Wait until the reveal to talk about them. Repeating that process gives each pairing visits we can compare.",
+    "Come back together a few times if you enjoy it. The map will then have more to show, and Neko can point out which comparable pairing shares choices most often.",
+  ], [
+    '你的搭档故事还需要多几场共同记录，Neko才能找到目前最有默契的组合。可以邀请想一起玩的人，也可以再约老搭档。',
+    '先约好符号，再各自独立选择，等答案揭晓后才聊想法。把这个流程重复几次，每种组合就有前后可以比较的记录啦。',
+    '如果玩得开心，就一起再来几场。关系图会添上更多内容，Neko也能告诉你，在可以比较的组合里，哪一组更常选到一起。',
+  ]),
+  tied: copy([
+    "The named partners are tied for your highest agreement rate. Neko has several connections to revisit here; each pairing has reached the same share of matching choices.",
+    "Return with these partners separately, keeping the same symbols and process. Choose independently and talk after the reveal, so each pairing keeps its own clear record.",
+    "Give each connection another few visits if you'd like. We'll see how the pairings develop without having to settle the tie right away. There's room for more than one familiar partner.",
+  ], [
+    '上方几位搭档目前并列最有默契，相同选择的比例一样高。Neko这次要多夹几个书签，每条连线都值得再回访看看。',
+    '下次可以分别和这些搭档再玩，保留同样的符号与流程。各自独立选择，等揭晓后再聊，每种组合都留下自己的记录。',
+    '想继续的话，就给每条连线再添几场，不急着立刻分出第一名。Neko更想看看，和不同搭档一起玩，会怎样慢慢展开。',
+  ]),
+  only: copy([
+    "The named partner has your highest agreement rate so far. This is also the only pairing with enough comparable rounds. Neko would revisit it and add another session.",
+    "Keep the symbols familiar and choose independently again. Wait for the reveal, then talk about your choices. That gives this connection another complete visit to compare.",
+    "You can invite other partners when you'd like, too. More shared records will let the map compare different pairings while keeping this familiar connection in view.",
+  ], [
+    '上方这位搭档目前与你最有默契，也是唯一积累了足够同组记录的组合。Neko先记住这条线，下次可以接着玩。',
+    '保留熟悉的符号，再各自独立做出选择。等揭晓之后再聊想法，让这条连线多留一场完整记录，也方便前后比较。',
+    '想认识别的组合，也可以邀请新搭档加入。共同记录多起来，关系图就能比较不同搭档，这条熟悉的连线也会留在里面。',
+  ]),
+  single: copy([
+    "The named partner has your highest agreement rate among comparable pairings. Neko would put a bookmark on this connection and invite you to return with them.",
+    "Use the same symbols and choose independently for another session. Talk after the reveal and keep the complete record, so we can follow how this pairing changes.",
+    "Revisit the other pairings when you feel like it, too. Each connection can have its own pace; the map will keep them together so you can look back across those visits.",
+  ], [
+    '在目前可以比较的组合里，上方这位搭档与你最有默契。Neko替这条连线夹个书签，下一次可以约好再回来玩。',
+    '用同样的符号，各自独立完成选择，揭晓之后再聊想法。把整场都留下，我们就能继续看看，这种组合会怎样变化。',
+    '也可以再约其他搭档，每条连线都能有自己的节奏。关系图会把这些共同记录留在一起，方便以后回头读读各次相遇。',
+  ]),
+}
+
+const synthesis = {
+  mixed: copy([
+    "Your directions are changing at different paces: some are rising and some are lower. Neko would read those lines separately, with each direction's own visits beside it.",
+    "Keep the settings familiar in each game when you return. That lets us follow both kinds of change without combining them into one score or losing the details.",
+    "You can pick the line you're most curious about for the next session. Keep adding elsewhere when you feel like it; the next report will have more to compare in each direction.",
+  ], [
+    '你的几个方向出现了不同步的变化，有的正在上升，有的近期回落。Neko会把它们分别读，让每条线保留自己的节奏。',
+    '下次在每种玩法里保留熟悉设置，我们就能接着看这些变化。各个方向分开比较，细节会更清楚，也不用挤成一个总分。',
+    '下一场先挑最好奇的那条线继续玩，其他方向有空再补。等你带着新记录回来，每个方向都能多一点前后可读的内容。',
+  ]),
+  rising: copy([
+    "Several directions are rising recently. Neko has more than one upward stretch to mark on this report. Keep these sessions together so we can follow each line on the next visit.",
+    "Repeat the familiar settings if you'd like to see how the change develops. There's no need for every new session to set a higher result; keep all of them in the record.",
+    "The next report can show whether these lines continue upward or turn. Choose a game you want to revisit, play the whole session, and bring the result back when you're ready.",
+  ], [
+    '这次有几个方向都在近期往上走，Neko要给不止一条线夹上书签啦。先把这些记录留好，下次可以分别看它们的变化。',
+    '想看看接下来怎样，就保留熟悉的设置再试。每一场都有自己的结果，不用次次更高，完整留下，前后才方便一起读。',
+    '下一份报告会让我们看见，这些线继续上升还是开始转弯。先选最想回访的玩法，完整玩好一场，再带着结果回来就好。',
+  ]),
+  stable: copy([
+    "Several directions have stayed fairly steady recently. Neko can keep this stretch as a familiar reference for later visits, even if the curves aren't making a dramatic turn.",
+    "You can repeat the current approach, or choose one direction and change one thing. Keep the rest familiar so you'll know which visits belong together when you compare them.",
+    "Let the record follow the games you want to play. Future changes will have these earlier sessions beside them, and we'll be able to see where a different pace began.",
+  ], [
+    '你的几个方向近期都比较平稳，前后的线没有明显转折。Neko会留好这一段熟悉的参照，以后有变化时可以一起比较。',
+    '继续照原来的方式玩也行，选一个方向调整一件小事也行。其他设置先保持熟悉，回头就知道哪些场次可以放在一起看。',
+    '记录跟着你想玩的节奏走就好，不用为了图形好看制造起伏。以后有了新变化，我们就能看看，它是从哪里换了步调。',
+  ]),
+  single: copy([
+    "One direction has a clear recent change while the others are steady or still need more visits. Neko would follow that line first and keep the other pages open for later.",
+    "Return with familiar settings to the direction that changed. You can add sessions elsewhere at your own pace, so the next comparison has a little more context.",
+    "Each completed visit gives us something specific to read. Pick the game you're curious about, finish the session, and we'll put its new result beside the earlier ones.",
+  ], [
+    '这次有一个方向出现了比较明显的变化，其他线平稳一些，或还在等记录。Neko先沿着这条线看，其他页也好好留着。',
+    '下一场在这个方向保留熟悉的设置，接着看看变化怎样延续。其他玩法按自己的节奏补上，下次比较时就有更多前后文。',
+    '每次完整做完，我们都多一份具体的记录可读。先选你好奇的项目玩好一场，再把新结果放在旧记录旁边，一起看看喵。',
+  ]),
+  pending: copy([
+    "Your profile has its first outlines, while changes over time still need more visits. Neko would leave the open spaces ready for later and start with a game you want to revisit.",
+    "Try a familiar session again or return to the questionnaire. Keep each complete record, including quieter visits, so we can read how the sequence develops.",
+    "You don't need to fill every direction at once. A new visit will give us a little more to discuss, and you can decide what to play next after seeing how it went.",
+  ], [
+    '你的画像已经有了一些轮廓，连续变化还在等更多记录。Neko先留好这些空白，下次从最想再玩的方向开始就行。',
+    '可以用熟悉设置再试一场，或者回到问卷看看最近的生活体验。每次完整记录都留着，安静的几场也能接进时间线里。',
+    '不用一下填满所有方向，新的一场会给我们多一点话题。等看过这次玩得怎样，你再慢慢决定下一个想去的地方就好。',
+  ]),
+}
+
+const notes = {
+  welcome: copy(["Hi, I'm Neko. Pick a game and I'll keep you company through hidden information, future choices, paired agreement and everyday experience. We can take them one at a time."], ['你好呀，我是Neko。隐藏信息、未来选择、双人默契和日常体验，四个方向都可以一起玩，先挑你最好奇的那个喵。']),
+  report_intro: copy(["Neko has put your completed visits together. We'll read the games you've returned to, the lines that changed and the partners who chose with you. Start with whichever page catches your eye."], ['Neko把你完成的记录放在一起啦，我们会看看常玩的方向、最近的变化和搭档默契。先从你最想翻开的那一页开始。']),
+  recent_pending: copy(["The timeline needs a few more visits before we can compare earlier and later periods. Keep familiar settings for another session, and Neko will add it to the record."], ['时间线还需要多几次回访，才能比较前后两段。下一场保留熟悉的设置，完整做完，Neko会把新记录接进来等你看。']),
+  radar_guide: copy(["The radar puts four directions on one page. Read each one separately; an open direction can wait until you try it. Neko will add its result when a complete record arrives."], ['雷达图把四个方向放在一页，分别看看就好。还没开启的地方先留白，等你完成对应记录，Neko再把新的结果添上去。']),
+  radar_note: copy(["The games show their matching rates here, while DSES shows reported experience on the same display range. Read each direction's notes to see how its point was drawn."], ['实验方向展示命中或一致的比例，问卷展示你报告的体验，换到同一显示范围。看看各页说明，就知道每个点怎样画出来。']),
+  network_intro: copy(["Each line joins you to someone you've played with. Neko keeps each pairing's shared sessions together; a thicker line means that pairing has more valid rounds in its record."], ['每条线连着一位和你一起玩过的搭档，Neko会把共同记录放在一起。线条越粗，表示你们已经留下更多共同有效回合。']),
+  network_empty: copy(["The partner map is still waiting for its first shared visit. Invite someone to choose independently with you, then come back after the reveal and Neko will draw the connection."], ['搭档地图还在等第一次共同探索，约个人一起独立选择，再等揭晓吧。完成之后回来，Neko就能给你们添上第一条连线。']),
+  network_caption: copy(["This map shows partners from your own completed sessions. Signed-in partners can keep a connection across visits; guest pairings stay separate so different people aren't merged."], ['这张图只收录与你一起完成过的搭档。登录账号的共同记录可以接起来，游客按房间分别留线，免得把不同的人混到一起。']),
+  network_empty_caption: copy(["Your first paired session will give this map a place to begin. Use familiar symbols, let each person choose on their own, and wait for the reveal before discussing the answers."], ['第一场双人测试会给地图一个起点，用熟悉的符号，各自选好再等揭晓。等结束以后再聊答案，Neko会帮你们留好记录。']),
+  trend_other: copy(["These sessions use a different group of settings, so Neko keeps their line on a separate chart. Read them together here and return with the same setup if you'd like to compare later."], ['这一组使用了不同设置，Neko给它单独留一条线，不混进其他组里。以后想比较，就用同样设置回来，再添几场完整记录。']),
+  trend_empty: copy(["The timeline is waiting for a completed visit. Try a game or fill in the questionnaire, then return here. Neko will place that first record on the chart as the starting point."], ['时间线还在等一份完成的记录，先玩一场或填好问卷，再回来看看。Neko会把第一份放上图，给后面的变化留个起点。']),
+  method_profile: copy([
+    "Neko uses 20 valid rounds as the point for a fuller experimental description. The six profiles describe where you've spent your visits across games and questionnaires.",
+    "Solo games compare their match rate with a 20% reference. More than five percentage points above or below it gets a different description; the middle range is described as steady.",
+  ], [
+    '实验达到20个有效回合后，Neko才给出更具体的描述。六种画像按你怎样分配实验与问卷记录来分类，看看探索重心。',
+    '单人玩法以20%为参考，超过它上下各5个百分点，就换用对应描述。中间范围写作平稳探索，方便你读不同阶段的记录。',
+  ]),
+  method_trend: copy([
+    "A trend needs at least three records with the same protocol and symbols. Each comparison window uses min(3, floor(n/2)) entries from the start and end, without overlap.",
+    "Experimental windows each need ten rounds. Neko weights their match rates by round count. A difference above five percentage points is up, below minus five is down; the rest is steady.",
+  ], [
+    '趋势至少要3次同流程、同符号记录，前后各取min(3,floor(n/2))份。两段不重叠，Neko再比较它们。',
+    '实验前后每段都要10回合，按回合数加权计算比例。相差超过正负5个百分点写作上升或回落，其余写作平稳。',
+  ]),
+  method_partner: copy(["Partner ranking uses signed-in partners with at least ten rounds in the current comparison group. Neko compares agreement rates within that group and keeps tied leaders together."], ['搭档排序只看登录伙伴，同组至少10回合才能参与。Neko比较相同设置下的一致率，遇到并列就一起列出，不急着分第一。']),
+  method_dses: copy([
+    "DSES descriptions use complete questionnaires. A mean of at least four is frequent, 2.5 to below four is occasional, and below 2.5 is quieter reported experience.",
+    "Neko draws the DSES mean as (mean-1)/5*100 on the radar. Earlier and later questionnaires each have equal weight; a display change beyond five points sets the trend direction.",
+  ], [
+    'DSES只用完整问卷，均值达到4写作体验频繁，达到2.5但低于4写作间歇出现，低于2.5则写作安静阶段。',
+    '雷达显示值按(均值-1)/5*100换算。前后问卷等权平均，显示值差超过正负5点才写上升或回落，其他写平稳。',
+  ]),
+  reading_note: copy([
+    "Neko reads these records as an exploration report. The descriptions don't certify supernatural ability, and the Chinese DSES translation hasn't been validated as a measurement scale.",
+  ], ['Neko陪你读的是探索记录，报告不能认证超自然能力。中文DSES是网页翻译，尚未经量表效度验证，请带着好奇轻松阅读。']),
+  dimension_missing: copy([
+    "This direction is still open for a first visit. Pick it when you feel curious and follow the page instructions. Neko will add the chart and commentary after you complete it.",
+    "The first record gives later visits a place to begin. You can keep the settings familiar when you return, then read the new session beside your first one.",
+  ], [
+    '这一方向还留着空白，想试的时候就把它当作新入口吧。按页面流程完成一次，Neko就能为你添上对应的图形和解读。',
+    '第一份记录会给以后一个起点，下次可以用熟悉设置再回来。等新的一场做完，我们把前后放在一起，慢慢看看变化。',
+  ]),
+  dimension_limited: copy([
+    "You've left the first few observations in this direction. Neko has a starting point now; a few more complete sessions with familiar settings will give us more to read.",
+    "Notice how you decide, including quick choices and longer pauses. Keep the whole session, then return when you'd like to try again. Later records will add detail to this page.",
+  ], [
+    '这个方向已经有了第一批小片段，Neko收到你的起点啦。保留熟悉的设置，再完整试几场，我们就有更多内容能一起读。',
+    '也可以留意决定很快和稍作犹豫的回合，把整场都留下。想再玩的时候回来，新记录会给这一页慢慢添上更多细节。',
+  ]),
+  trend_insufficient: copy([
+    "This timeline needs a few more visits before Neko can compare its earlier and later parts. Keep familiar settings and let the whole session become the next entry.",
+    "You can notice the pace of each visit without looking for a rise or fall yet. Connected records will give us a clearer view when you return with another session.",
+  ], [
+    '这一条时间线还需要多几次回访，Neko才能比较前后两段。先保留熟悉的设置，把整场完整做完，接着添下一份记录。',
+    '现在可以留意每次的节奏，不急着寻找上升或回落。等记录慢慢接起来，再回来看看，就会有更清楚的前后变化可读。',
+  ]),
+  guidance_explore: copy(["Give another direction a complete visit when you're curious. Pick the game that sounds fun, follow its process, and decide afterward whether you'd like to return. Neko can wait for the rest."], ['给还没展开的方向留一次尝试吧，先挑最感兴趣的项目，完整走完再决定要不要回访。其他玩法慢慢补，Neko陪你等。']),
+  guidance_dses: copy(["Give everyday experience a first page, too. Complete DSES with the recent period in mind. When you return later, Neko can place the next questionnaire beside this starting point."], ['也给生活体验留一页记录吧，完整填写DSES，照最近一段时间的整体感受回答。以后再回来，Neko就能把前后接起来。']),
+  guidance_partner: copy(["Arrange another visit with a partner you'd like to play with. Keep familiar symbols, choose independently and talk after the reveal. You can swap roles for a second view of the pairing."], ['再约一位想继续玩的搭档，用熟悉符号，各自独立选择，揭晓之后才聊想法。也可以交换角色，让共同记录再多一个视角。']),
+  guidance_rhythm: copy([
+    "Decide on settings and round count before the next game, then finish it and review afterward. Neko will keep the whole visit, including the results you were less pleased with.",
+    "If you'd like to try a new approach, adjust one thing at a time. Keeping other settings familiar will make the earlier and later sessions easier to read together.",
+  ], [
+    '下一场先定好设置和回合数，完整做完再统一回看。没那么满意的一场也留下，Neko会把每次尝试都接进记录里面。',
+    '想换一种做法时，一次调整一件小事就好，其他设置先保持熟悉。以后翻回报告，前后的几场就会更容易放在一起读。',
+  ]),
+}
+
+export const NEKO_COPY_KEYS = Object.freeze(Object.keys(notes))
+export const nekoCopy = (key, en = false) => read(notes[key], en)
+export const profileCopy = (key, en = false) => read(profiles[key], en)
+export function dimensionNarrative(key, tier, en = false) {
+  const [zhTitle, enTitle, body] = dimensions[key][tier]
+  return { verdict: en ? enTitle : zhTitle, text: read(body, en) }
+}
+export function trendNarrative(d, direction, en = false) {
+  const entry = d.key === 'dses' ? dailyTrends[direction] : experimentTrends[direction]
+  let text = read(entry, en)
+  if (d.key === 'telepathy') text = en ? text.replace(/matches/g, 'shared choices') : text.replaceAll('和答案对上', '两人选到一起').replaceAll('没选中的答案', '不同的选择')
+  return text
+}
+export function partnerNarrative(_names, leaderCount, candidateCount, en = false) {
+  // Names are rendered separately from paragraphs so long account names never
+  // change paragraph length. The named leaders remain in analysis.partner.leaders.
+  const key = !leaderCount ? 'empty' : leaderCount > 1 ? 'tied' : candidateCount === 1 ? 'only' : 'single'
+  return read(partners[key], en)
+}
+export function synthesisNarrative(trends, en = false) {
+  const up = trends.filter(t => t.direction === 'up'), down = trends.filter(t => t.direction === 'down'), stable = trends.filter(t => t.direction === 'stable')
+  const key = up.length && down.length ? 'mixed' : up.length >= 2 ? 'rising' : stable.length >= 2 && !up.length && !down.length ? 'stable' : up.length || down.length ? 'single' : 'pending'
+  // A changing direction gets its own paragraph instead of a long label list.
+  const changes = [...up, ...down].map(t => en
+    ? `${t.label} is ${t.direction === 'up' ? 'rising' : 'lower'} recently. Neko will follow this direction separately using comparable sessions, then read the next visit beside the earlier ones.`
+    : `${t.label}近期${t.direction === 'up' ? '正在上升' : '有所回落'}，Neko会单独沿着这一方向继续看。下一场保留熟悉设置，再把新的记录放在前面几场旁边。`)
+  return [read(synthesis[key], en), ...changes].join('\n\n')
 }
