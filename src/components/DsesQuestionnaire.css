@@ -1,0 +1,391 @@
+.dses {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+  width: min(820px, 100%);
+  max-width: 100%;
+  box-sizing: border-box;
+  color: var(--color-text);
+}
+
+.dses *,
+.dses *::before,
+.dses *::after {
+  box-sizing: border-box;
+}
+
+.dses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dses-title {
+  margin: 0;
+  font-size: 20px;
+}
+
+.dses-intro,
+.dses-hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.dses-hint code,
+.dses-source-list code {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.dses-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  min-width: 0;
+}
+
+.dses-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dses-panel-title {
+  margin: 0;
+  font-size: 16px;
+}
+
+.dses-panel-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dses-pdf-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dses-btn {
+  padding: 8px 14px;
+  border-radius: var(--radius-button);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--color-card-border);
+  background: transparent;
+  color: var(--color-text);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.dses-btn:hover:not(:disabled) {
+  background: var(--color-bg);
+}
+
+.dses-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dses-btn-primary {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.dses-btn-primary:hover:not(:disabled) {
+  background: var(--color-accent);
+  filter: brightness(0.95);
+}
+
+.dses-btn-danger {
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.dses-btn-danger:hover:not(:disabled) {
+  background: var(--color-danger);
+  color: #fff;
+}
+
+.dses-btn-mini {
+  padding: 4px 10px;
+  font-size: 12px;
+}
+
+.dses-details summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.dses-source-list {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.dses-source-list a {
+  color: var(--color-accent);
+}
+
+.dses-sha {
+  word-break: break-all;
+}
+
+.dses-progress {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+
+.dses-progress-mean strong {
+  color: var(--color-accent);
+}
+
+.dses-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dses-item {
+  min-width: 0;
+}
+
+.dses-fieldset {
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--color-card-border);
+  border-radius: 12px;
+  min-width: 0;
+}
+
+.dses-legend {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  padding: 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dses-item-no {
+  color: var(--color-text);
+}
+
+.dses-item-theme {
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.dses-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.dses-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--color-card-border);
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+  background: var(--color-bg);
+  min-width: 0;
+}
+
+.dses-option:hover {
+  border-color: var(--color-accent);
+}
+
+.dses-option input {
+  margin: 0;
+  accent-color: var(--color-accent);
+}
+
+.dses-option:has(input:checked) {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+.dses-option-text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+}
+
+.dses-option-zh {
+  color: var(--color-text);
+}
+
+.dses-option-en {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.dses-option-blank {
+  opacity: 0.85;
+}
+
+.dses-sheet-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dses-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.dses-file-input {
+  display: none;
+}
+
+.dses-empty {
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.dses-records {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dses-record {
+  display: grid;
+  grid-template-columns: minmax(120px, 1.4fr) 1fr 0.8fr 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--color-bg);
+  font-size: 13px;
+  min-width: 0;
+}
+
+.dses-record-date,
+.dses-record-count,
+.dses-record-mean,
+.dses-record-delta {
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.dses-record-mean {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.dses-message {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  border: 1px solid var(--color-card-border);
+}
+
+.dses-message-success {
+  color: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.dses-message-error {
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.dses-message-info {
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 640px) {
+  .dses {
+    padding: 16px;
+  }
+
+  .dses-record {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'date delta'
+      'count mean'
+      'del del';
+    row-gap: 4px;
+  }
+
+  .dses-record-date {
+    grid-area: date;
+  }
+
+  .dses-record-count {
+    grid-area: count;
+  }
+
+  .dses-record-mean {
+    grid-area: mean;
+    text-align: right;
+  }
+
+  .dses-record-delta {
+    grid-area: delta;
+    text-align: right;
+  }
+
+  .dses-record .dses-btn-mini {
+    grid-area: del;
+    justify-self: end;
+  }
+
+  .dses-option {
+    flex: 1 1 auto;
+  }
+}

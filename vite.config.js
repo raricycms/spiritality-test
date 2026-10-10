@@ -6,10 +6,14 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
+    proxy: {
+      '/api': 'http://127.0.0.1:3001',
+    },
   },
   test: {
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./test-setup.js'],
+    exclude: ['**/node_modules/**', '**/dist/**', '**/.tmp/**', 'server/**'],
   },
 })
