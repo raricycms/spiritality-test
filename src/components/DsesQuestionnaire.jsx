@@ -50,18 +50,21 @@ function fmtDelta(delta) {
  * Props:
  *   onBack?() => void   optional back / close action.
  */
-export function DsesQuestionnaire({ onBack }) {
+export function DsesQuestionnaire({ onBack, accountMode = false, accountRecords = [], onSaveAccount, onDeleteAccount }) {
   const { localize, t, language } = useI18n()
   const [loading, setLoading] = useState(true)
   const [records, setRecords] = useState([])
   const [answers, setAnswers] = useState(blankAnswers)
-  const [draftEnabled, setDraftEnabled] = useState(true)
+  const [draftEnabled, setDraftEnabled] = useState(!accountMode)
   const [message, setMessage] = useState(null)
   const [draftStatus, setDraftStatus] = useState('')
   const importRef = useRef(null)
+  const savingRef = useRef(false)
+  const [saving, setSaving] = useState(false)
 
   // Load finished records + an optional local draft on mount.
   useEffect(() => {
+    if (accountMode) { setLoading(false); return }
     let restored = false
     try {
       const stored = loadDsesRecords()
@@ -77,6 +80,8 @@ export function DsesQuestionnaire({ onBack }) {
     setLoading(false)
     if (restored) setMessage({ type: 'info', text: '已恢复本机保存的答题草稿。' })
   }, [])
+
+  useEffect(() => { if (accountMode) setRecords([...accountRecords].sort((a,b)=>b.createdAt-a.createdAt)) }, [accountMode, accountRecords])
 
   const score = useMemo(() => computeDsesScore(answers), [answers])
   const savedRecords = useMemo(
@@ -116,7 +121,7 @@ export function DsesQuestionnaire({ onBack }) {
     setDraftStatus('草稿已清除')
   }
 
-  function handleSave() {
+  async function handleSave() {
     if (score.answered === 0) {
       setMessageSafe({ type: 'error', text: '至少作答一题后才能保存（空答案不会保存）。' })
       return
@@ -124,6 +129,18 @@ export function DsesQuestionnaire({ onBack }) {
     const record = createDsesRecord(answers)
     if (!record) {
       setMessageSafe({ type: 'error', text: '没有有效作答，未保存。' })
+      return
+    }
+    if (accountMode) {
+      if (savingRef.current) return
+      savingRef.current = true
+      setSaving(true)
+      try {
+        await onSaveAccount(answers)
+        setAnswers(blankAnswers())
+        setMessageSafe({ type: 'success', text: '本次问卷已保存到账号。' })
+      } catch { setMessageSafe({ type: 'error', text: '账号保存失败，答案仍保留，请重试。' }) }
+      finally { savingRef.current = false; setSaving(false) }
       return
     }
     const next = mergeDsesRecords(records, [record])
@@ -145,7 +162,8 @@ export function DsesQuestionnaire({ onBack }) {
     })
   }
 
-  function handleDelete(id) {
+  async function handleDelete(id) {
+    if (accountMode) { try { await onDeleteAccount(id) } catch { setMessageSafe({type:'error',text:'删除账号记录失败，请重试。'}) } return }
     const next = records.filter((r) => r.id !== id)
     const ok = saveDsesRecords(next)
     if (!ok) {
@@ -156,7 +174,12 @@ export function DsesQuestionnaire({ onBack }) {
     setMessageSafe({ type: 'success', text: '已删除该条记录。' })
   }
 
-  function handleClearAll() {
+  async function handleClearAll() {
+    if (accountMode) {
+      if (!window.confirm(t('确定清空账号全部 DSES 记录？'))) return
+      try { await onDeleteAccount() } catch { setMessageSafe({type:'error',text:'删除账号记录失败，请重试。'}) }
+      return
+    }
     if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
       if (!window.confirm(t('确定清空本机全部 DSES 记录？此操作不影响实验历史或其他数据。'))) return
     }
@@ -345,7 +368,7 @@ export function DsesQuestionnaire({ onBack }) {
             type="button"
             className="dses-btn dses-btn-primary"
             onClick={handleSave}
-            disabled={score.answered === 0}
+            disabled={score.answered === 0 || saving}
           >
             保存本次记录
           </button>
@@ -356,6 +379,7 @@ export function DsesQuestionnaire({ onBack }) {
             <input
               type="checkbox"
               checked={draftEnabled}
+              disabled={accountMode}
               onChange={(e) => handleDraftToggle(e.target.checked)}
             />
             在本机保留答题草稿
@@ -371,7 +395,7 @@ export function DsesQuestionnaire({ onBack }) {
       {/* ---------------- Records ---------------- */}
       <section className="dses-panel" aria-label="个人记录">
         <header className="dses-panel-header">
-          <h3 className="dses-panel-title">我的记录（仅本机）</h3>
+          <h3 className="dses-panel-title">{accountMode ? '我的记录（账号）' : '我的记录（仅本机）'}</h3>
           <div className="dses-panel-actions">
             <button
               type="button"
@@ -385,6 +409,7 @@ export function DsesQuestionnaire({ onBack }) {
               type="button"
               className="dses-btn"
               onClick={() => importRef.current && importRef.current.click()}
+              disabled={accountMode}
             >
               导入 JSON
             </button>

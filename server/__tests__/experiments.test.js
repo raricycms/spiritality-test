@@ -77,6 +77,7 @@ function request(base, method, pathname, { token, body, raw } = {}) {
 
 async function startApp(options = {}) {
   const app = createExperimentServer({
+    retainAllSessions: true, // Legacy domain/persistence tests; production privacy is covered in accounts.test.js.
     distDir: path.join(os.tmpdir(), 'spirituality-no-dist'),
     storage: options.storage || createMemoryStorage(),
     clock: options.clock,
@@ -533,7 +534,7 @@ test('persistence: sessions, tokens and targets survive a restart', async () => 
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'spirituality-exp-'))
   const dataFile = path.join(dir, 'experiments.json')
   try {
-    const app1 = createExperimentServer({ dataFile, random: () => 0, distDir: path.join(dir, 'no-dist') })
+    const app1 = createExperimentServer({ retainAllSessions: true, dataFile, random: () => 0, distDir: path.join(dir, 'no-dist') })
     const { port: p1 } = await app1.listen(0, '127.0.0.1')
     const base1 = `http://127.0.0.1:${p1}`
     const created = await create(base1, { experimentType: 'hidden', roundsPerSession: 5 })
@@ -542,7 +543,7 @@ test('persistence: sessions, tokens and targets survive a restart', async () => 
     await guess(base1, sessionId, token, { roundId: r0, guess: 1 })
     await app1.close()
 
-    const app2 = createExperimentServer({ dataFile, random: () => 4, distDir: path.join(dir, 'no-dist') })
+    const app2 = createExperimentServer({ retainAllSessions: true, dataFile, random: () => 4, distDir: path.join(dir, 'no-dist') })
     const { port: p2 } = await app2.listen(0, '127.0.0.1')
     const base2 = `http://127.0.0.1:${p2}`
     const restored = await get(base2, sessionId, token)

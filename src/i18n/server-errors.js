@@ -1,5 +1,9 @@
 // Keep protocol messages unchanged; localize them only for presentation.
 export const SERVER_ERRORS_ZH = {
+  'login required': '请重新使用 raricy 账号登录。',
+  'raricy authorization failed': 'raricy 授权失败，请重试登录。',
+  'invalid request origin': '请求来源无效，请在本站重试。',
+  'invalid DSES answers': '问卷答案格式无效。',
   'invalid candidate set': '请选择有效的候选符号组。',
   'only the sender may select a target': '只有发送者可以选择目标。',
   'this protocol does not allow target selection': '当前协议不支持发送者选数，请创建新房间。',

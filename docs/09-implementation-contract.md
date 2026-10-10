@@ -62,7 +62,7 @@
 
 ## 数据与统计
 
-服务端私有 `.data/experiments.json` 持久化真实会话与凭证，采用原子替换并按操作顺序写入。原始文件不得通过 HTTP 提供。浏览器 sessionStorage 保存当前标签页的恢复凭证；localStorage 的独立 v2 命名空间保存终态安全快照及历史。原有 v1 数据保留并作为旧版记录单独展示，不与新协议累计。
+账号接入后，活动实验及凭证仅在内存，游客终态不落盘；登录用户按账号归档安全快照至私有 `.data/accounts.json`。旧 `.data/experiments.json` 不再读取／写入。浏览器 sessionStorage 保存当前标签页的临时恢复凭证；游客 localStorage 保存终态历史，登录用户独立读取账号记录。数据清理、双人结果交付窗口和 OAuth 配置见第 11 章。原有 v1 数据保留并在游客界面独立展示。
 
 新统计模块：`src/lib/experiment-statistics.js` 导出 `summarizeExperiment(session, prior = { alpha: 1, beta: 1 })`、`groupExperimentHistory(sessions, prior)`。
 

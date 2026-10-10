@@ -188,6 +188,8 @@ export class ExperimentService {
     this.clock = typeof options.clock === 'function' ? options.clock : Date.now
     this.random = typeof options.random === 'function' ? options.random : defaultRandom
     this.storage = options.storage || null
+    this.privateAccounts = options.accountStore || null
+    this.ephemeral = options.ephemeral === true
     this.defaults = { ...DEFAULT_SETTINGS, ...(options.defaults || {}) }
     this.state = { version: PROTOCOL_VERSION, sessions: {}, tokens: {}, roomCodes: {} }
     this._initPromise = null
@@ -196,7 +198,7 @@ export class ExperimentService {
   ensureInit() {
     if (!this._initPromise) {
       this._initPromise = (async () => {
-        if (!this.storage) return
+        if (this.ephemeral || !this.storage) return
         const loaded = await this.storage.load()
         if (loaded && typeof loaded === 'object') {
           this.state.sessions = loaded.sessions || {}
@@ -210,6 +212,18 @@ export class ExperimentService {
 
   /** Ordered, atomic-by-delegation persistence. Snapshot is captured synchronously. */
   async persist() {
+    if (this.ephemeral) {
+      for (const session of Object.values(this.state.sessions)) {
+        if (!isTerminalStatus(session.status) || session.archived) continue
+        const entries = Object.entries(session.participants || {}).filter(([, account]) => account).map(([role, account]) => {
+          const peer = session.participants[role === 'sender' ? 'receiver' : 'sender']
+          return { account, snapshot: { ...serializeSession(session, role), partner: session.experimentType === 'telepathy' ? (peer ? { sub: peer.sub, username: peer.username } : { username: null }) : null } }
+        })
+        if (entries.length) await this.privateAccounts.archive(entries)
+        session.archived = true
+      }
+      return
+    }
     if (!this.storage) return
     const payload = JSON.parse(JSON.stringify(this.state))
     await this.storage.save(payload)
@@ -228,6 +242,7 @@ export class ExperimentService {
     }
     const session = this._sessionById(sessionId)
     if (!session) throw new HttpError(404, 'session not found')
+    session.touchedAt = this.clock()
     return { session, role: record.role }
   }
 
@@ -341,10 +356,36 @@ export class ExperimentService {
   }
 
   _snapshot(session, role) {
-    return serializeSession(session, role)
+    const snapshot = serializeSession(session, role)
+    if (this.ephemeral && session.archived && isTerminalStatus(session.status)) {
+      session.delivered = { ...session.delivered, [role]: true }
+      // Pair results survive only until the second participant receives them.
+      // A bounded delivery window handles a disconnected peer without retaining a history.
+      if (session.experimentType !== 'telepathy' || (session.delivered.sender && session.delivered.receiver)) this._discard(session.id)
+    }
+    return snapshot
   }
 
-  async createExperiment(body = {}) {
+  _discard(id) {
+    delete this.state.sessions[id]
+    for (const [token, entry] of Object.entries(this.state.tokens)) if (entry.sessionId === id) delete this.state.tokens[token]
+    for (const [code, value] of Object.entries(this.state.roomCodes)) if (value === id) delete this.state.roomCodes[code]
+  }
+
+  async sweep() {
+    if (!this.ephemeral) return
+    for (const session of Object.values(this.state.sessions)) {
+      if (isTerminalStatus(session.status)) {
+        if (this.clock() - session.completedAt > 300_000) { await this.persist(); this._discard(session.id) }
+      } else if (this.clock() - (session.touchedAt ?? session.createdAt) > 21_600_000) {
+        session.status = 'ABANDONED'; session.completedAt = this.clock(); session.activeRoundId = null
+        for (const round of session.rounds) if (round.status !== 'REVEALED') { round.status = 'ABANDONED'; round.invalidReason = 'expired' }
+        await this.persist(); this._discard(session.id)
+      }
+    }
+  }
+
+  async createExperiment(body = {}, account = null) {
     await this.ensureInit()
     const type = body.experimentType
     if (!EXPERIMENT_TYPES.includes(type)) {
@@ -388,6 +429,7 @@ export class ExperimentService {
       activeRoundId: null,
       roomCode: null,
       conditions: null,
+      participants: { [type === 'telepathy' ? 'sender' : 'receiver']: account },
     }
 
     if (type === 'telepathy') {
@@ -406,7 +448,7 @@ export class ExperimentService {
     return { sessionId: session.id, token, role, snapshot: this._snapshot(session, role) }
   }
 
-  async joinRoom({ code } = {}) {
+  async joinRoom({ code } = {}, account = null) {
     await this.ensureInit()
     if (typeof code !== 'string' || !code.trim()) {
       throw new HttpError(400, 'code is required')
@@ -423,6 +465,7 @@ export class ExperimentService {
 
     const token = makeToken()
     const role = 'receiver'
+    session.participants = { ...session.participants, receiver: account }
     this.state.tokens[token] = { sessionId: session.id, role }
     // One-time join: the code is consumed. The session keeps its own copy so the
     // sender can still display it.
@@ -436,7 +479,7 @@ export class ExperimentService {
     await this.ensureInit()
     const { session, role } = this.authorize(id, token)
     const now = this.clock()
-    if (this._advance(session, now)) await this.persist()
+    if (this._advance(session, now) || (this.ephemeral && isTerminalStatus(session.status) && !session.archived)) await this.persist()
     return this._snapshot(session, role)
   }
 

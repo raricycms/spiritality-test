@@ -47,6 +47,9 @@ import { pathToFileURL } from 'node:url'
 
 import { createExperimentService, HttpError } from './service.js'
 import { createFileStorage, DEFAULT_DATA_FILE } from './storage.js'
+import { createAccountStore } from './accounts.js'
+import { createAuth } from './auth.js'
+import { createReportPdf } from './report.js'
 
 const DEFAULT_PORT = 3001
 const DEFAULT_HOST = '0.0.0.0'
@@ -224,7 +227,7 @@ function serveStatic(req, res, distDir) {
 }
 
 async function handleRequest(req, res, ctx) {
-  const { service, distDir, bodyLimit, logger } = ctx
+  const { service, distDir, bodyLimit, logger, auth, accounts } = ctx
   let url
   try {
     url = new URL(req.url, 'http://localhost')
@@ -236,7 +239,32 @@ async function handleRequest(req, res, ctx) {
   const method = req.method || 'GET'
 
   try {
+    if (pathname === '/oauth/callback' && method === 'GET') return await auth.callback(req, res, url)
     if (pathname.startsWith('/api/')) {
+      if (pathname === '/api/auth/login' && method === 'GET') return auth.start(req, res)
+      if (pathname === '/api/auth/callback' && method === 'GET') return await auth.callback(req, res, url)
+      if (pathname === '/api/auth/logout' && method === 'POST') { await auth.logout(req, res); return sendJson(res, 200, {}) }
+      const account = await auth.account(req)
+      if (pathname === '/api/auth/session' && method === 'GET') return sendJson(res, 200, { account, configured: auth.configured })
+      if (account && !['GET', 'HEAD'].includes(method)) auth.csrf(req)
+      if (pathname.startsWith('/api/account/')) {
+        if (!account) throw new HttpError(401, 'login required')
+        if (pathname === '/api/account/history' && method === 'GET') return sendJson(res, 200, await accounts.history(account))
+        if (pathname === '/api/account/experiments' && method === 'DELETE') return sendJson(res, 200, await accounts.clearExperiments(account))
+        if (pathname === '/api/account/dses' && method === 'POST') {
+          const body = await readBody(req, bodyLimit)
+          return sendJson(res, 201, await accounts.saveDses(account, body.answers))
+        }
+        if (pathname === '/api/account/dses' && method === 'DELETE') return sendJson(res, 200, await accounts.deleteDses(account))
+        const dsesMatch = /^\/api\/account\/dses\/([^/]+)$/.exec(pathname)
+        if (dsesMatch && method === 'DELETE') return sendJson(res, 200, await accounts.deleteDses(account, decodeURIComponent(dsesMatch[1])))
+        if (pathname === '/api/account/report.pdf' && method === 'GET') {
+          const pdf = await createReportPdf(await accounts.history(account), account, url.searchParams.get('lang') === 'en' ? 'en' : 'zh')
+          res.writeHead(200, { 'content-type': 'application/pdf', 'content-length': pdf.length, 'content-disposition': 'attachment; filename="spirituality-report.pdf"', 'cache-control': 'no-store' })
+          return res.end(pdf)
+        }
+        return sendError(res, 404, 'unknown endpoint')
+      }
       if (pathname === '/api/health') {
         if (method !== 'GET') return sendError(res, 405, 'method not allowed')
         return sendJson(res, 200, service.health())
@@ -245,14 +273,14 @@ async function handleRequest(req, res, ctx) {
       if (pathname === '/api/experiments') {
         if (method !== 'POST') return sendError(res, 405, 'method not allowed')
         const body = await readBody(req, bodyLimit)
-        const result = await service.createExperiment(body)
+        const result = await service.createExperiment(body, account)
         return sendJson(res, 201, result)
       }
 
       if (pathname === '/api/rooms/join') {
         if (method !== 'POST') return sendError(res, 405, 'method not allowed')
         const body = await readBody(req, bodyLimit)
-        const result = await service.joinRoom(body)
+        const result = await service.joinRoom(body, account)
         return sendJson(res, 201, result)
       }
 
@@ -322,7 +350,7 @@ async function handleRequest(req, res, ctx) {
     if (err instanceof HttpError) {
       return sendError(res, err.status, err.message)
     }
-    if (logger && logger.error) logger.error('request failed', err)
+    if (logger && logger.error) logger.error('request failed', err.name) // Never log provider bodies, codes, or tokens.
     return sendError(res, 500, 'internal server error')
   }
 }
@@ -337,17 +365,27 @@ export function createExperimentServer(options = {}) {
     : DEFAULT_BODY_LIMIT
   const logger = options.logger || console
   const storage = options.storage || createFileStorage(options.dataFile || DEFAULT_DATA_FILE)
+  const accounts = options.accountStore || createAccountStore({ file: options.accountDataFile, clock: options.clock })
+  const auth = createAuth({ config: options.authConfig, fetch: options.authFetch, clock: options.clock })
 
   const service = createExperimentService({
     clock: options.clock,
     random: options.random,
     storage,
     defaults: options.defaults,
+    ephemeral: options.retainAllSessions !== true,
+    accountStore: accounts,
   })
 
+  const sweepTimer = setInterval(() => {
+    auth.sweep()
+    service.sweep().catch(() => logger.error('session cleanup failed'))
+  }, 60_000)
+  sweepTimer.unref()
+
   const server = http.createServer((req, res) => {
-    handleRequest(req, res, { service, distDir, bodyLimit, logger }).catch((err) => {
-      if (logger && logger.error) logger.error('unhandled request error', err)
+    handleRequest(req, res, { service, distDir, bodyLimit, logger, auth, accounts }).catch((err) => {
+      if (logger && logger.error) logger.error('unhandled request error', err.name)
       if (!res.headersSent) sendError(res, 500, 'internal server error')
       else res.end()
     })
@@ -357,6 +395,7 @@ export function createExperimentServer(options = {}) {
     server,
     service,
     storage,
+    accounts,
     /**
      * Start listening. Works both Node-style and promise-style:
      *   await app.listen(0, '127.0.0.1')           // -> { port, host }
@@ -368,6 +407,7 @@ export function createExperimentServer(options = {}) {
         host = options.host ?? DEFAULT_HOST
       }
       await service.ensureInit()
+      await accounts.init()
       await new Promise((resolve, reject) => {
         const onError = (err) => {
           server.removeListener('listening', onListening)
@@ -390,6 +430,7 @@ export function createExperimentServer(options = {}) {
       return server.address()
     },
     async close(callback) {
+      clearInterval(sweepTimer)
       await new Promise((resolve) => {
         server.close(() => resolve())
         if (typeof server.closeAllConnections === 'function') server.closeAllConnections()
@@ -411,6 +452,7 @@ function isMainModule() {
 }
 
 if (isMainModule()) {
+  try { process.loadEnvFile('.env') } catch (error) { if (error.code !== 'ENOENT') throw error }
   const port = Number(process.env.PORT || DEFAULT_PORT)
   const host = process.env.HOST || DEFAULT_HOST
   const app = createExperimentServer({})

@@ -10,6 +10,8 @@ import { I18nProvider, useI18n } from './i18n/I18n.jsx'
 import { OpeningAnimation } from './components/OpeningAnimation.jsx'
 import { Icon } from './components/Icon.jsx'
 import { CandidateSetPicker } from './components/CandidateSymbols.jsx'
+import { AccountProvider, useAccount } from './hooks/useAccount.jsx'
+import { AccountBanner, AccountReport } from './components/AccountPanel.jsx'
 import {
   saveExperimentHistory,
   loadExperimentHistory,
@@ -68,6 +70,7 @@ function fmtDate(ts) {
 
 function AppContent() {
   const { language, setLanguage, t, localize } = useI18n()
+  const auth = useAccount()
   const {
     history: v1History,
     settings,
@@ -105,6 +108,22 @@ function AppContent() {
 
   const savedTerminalRef = useRef(null)
   const pendingSaveRef = useRef(null)
+  const previousAccountRef = useRef(undefined)
+
+  useEffect(() => {
+    if (auth.loading) return
+    const id = auth.account?.sub || null
+    if (previousAccountRef.current !== undefined && previousAccountRef.current !== id) {
+      leave()
+      setView('main')
+      setSelectedModule(null)
+      savedTerminalRef.current = null
+      setHistoryError('')
+    }
+    previousAccountRef.current = id
+    setV2History(auth.account ? auth.history.experiments : safeLoadV2History())
+    pendingSaveRef.current = null
+  }, [auth.account?.sub, auth.history, auth.loading, leave])
 
   // Theme: auto follows the OS, manual override still available in settings.
   useEffect(() => {
@@ -133,17 +152,22 @@ function AppContent() {
   // Persist terminal safe snapshots immediately, by id, into the v2 history.
   useEffect(() => {
     const s = session
+    if (auth.loading) return
     if (!s || !s.id) return
     if (s.status !== 'COMPLETED' && s.status !== 'ABANDONED') return
     const key = `${s.id}:${s.status}`
     if (savedTerminalRef.current === key) return
     savedTerminalRef.current = key
+    if (auth.account) {
+      auth.refresh().catch(() => setHistoryError('账号历史暂时无法读取，请在报告页重试。'))
+      return
+    }
     setV2History((prev) => {
       const merged = safeMerge(prev, [s])
       pendingSaveRef.current = merged
       return merged
     })
-  }, [session])
+  }, [session, auth.loading, auth.account?.sub, auth.refresh])
 
   // Persist the merged v2 history outside the state updater (side-effect free).
   useEffect(() => {
@@ -232,8 +256,12 @@ function AppContent() {
     }
   }
 
-  function handleClearV2() {
+  async function handleClearV2() {
     if (!confirm(t('确定清空新协议的实验历史？此操作不会影响旧版（v1）记录。'))) return
+    if (auth.account) {
+      try { await auth.clearExperiments() } catch { setHistoryError('清空账号历史失败，请重试。') }
+      return
+    }
     try {
       if (saveExperimentHistory([]) === false) throw new Error('本机存储不可用')
     } catch {
@@ -477,9 +505,9 @@ function AppContent() {
           showLegacy={false}
           onClear={handleClearV2}
           onExport={handleExportV2}
-          onImport={handleImportV2}
+          onImport={auth.account ? undefined : handleImportV2}
         />
-        <details className="legacy-history">
+        {!auth.account && <details className="legacy-history">
           <summary>旧版记录（v1，单独展示，不与新协议合并）</summary>
           {v1History.length === 0 ? (
             <p className="flow-note">没有旧版记录。</p>
@@ -504,7 +532,7 @@ function AppContent() {
               <button className="danger-btn" onClick={handleClearV1}>清空旧版记录</button>
             </>
           )}
-        </details>
+        </details>}
       </div>
     )
   }
@@ -544,11 +572,14 @@ function AppContent() {
       <OpeningAnimation enabled={!session && !restoring} />
       {Header}
       <main className="main">
+        <AccountBanner active={Boolean(session && !isTerminal) || busy || restoring} onReport={() => setView('report')} />
         <div className="card">
-          {view === 'history'
+          {view === 'report' && auth.account
+            ? <AccountReport onBack={() => setView('main')} />
+            : view === 'history'
             ? renderHistory()
             : view === 'dses'
-              ? <DsesQuestionnaire onBack={() => setView('main')} />
+              ? <DsesQuestionnaire key={auth.account?.sub || 'guest'} accountMode={Boolean(auth.account)} accountRecords={auth.history.dses} onSaveAccount={auth.saveDses} onDeleteAccount={auth.deleteDses} onBack={() => setView('main')} />
             : view === 'settings'
               ? (
                 <SettingsPanel
@@ -570,5 +601,5 @@ function AppContent() {
 }
 
 export function App() {
-  return <I18nProvider><AppContent /></I18nProvider>
+  return <I18nProvider><AccountProvider><AppContent /></AccountProvider></I18nProvider>
 }
