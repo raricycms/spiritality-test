@@ -63,7 +63,7 @@ export function createReportPdf(history,account,language='zh') {
   g.stop(0,C.navy).stop(1,'#245f69');doc.rect(0,0,596,coverTop).fill(g)
   write('LING / RARICY',42,35,280,10,'#b9d6da')
   let coverY=write(t('灵性探索','Spirituality\nexploration'),42,85,270,en?29:36,C.white)+15
-  coverY=write(t('Neko 的个人探索报告',"Your exploration with Neko"),42,coverY,270,13,'#d6e7e8')+25
+  coverY=write(t('灵性分析师 Neko 的专属探索报告',"Exclusive Exploration Report by Spiritual Analyst Neko"),42,coverY,270,13,'#d6e7e8')+25
   coverY=write(short(account.username,28),42,coverY,270,14,C.white)+9
   write(date(Date.now()),42,coverY,270,9,'#b9d6da')
   doc.roundedRect(354,62,199,242,12).fill('#d6e7e8')

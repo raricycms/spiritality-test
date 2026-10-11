@@ -314,7 +314,7 @@ function AppContent() {
             </div>
           </div>
           <figure className="neko-portrait">
-            <img src="/images/neko.png" alt={language === 'en' ? 'Neko, the catgirl mascot, with her cat' : '猫娘吉祥物 Neko 和她的小猫'} width="1202" height="1309" />
+            <img src="/images/neko.png" alt={language === 'en' ? 'Neko, the Spiritual Analyst, with her cat' : '灵性分析师 Neko 和她的小猫'} width="1202" height="1309" />
             <figcaption>Neko</figcaption>
           </figure>
         </div>
