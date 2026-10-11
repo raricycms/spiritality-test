@@ -1,63 +1,59 @@
 # 灵性测试（Spirituality Test）
 
-每一轮，一个 1–5 的数字出现在屏幕上，但被一个不透明的卡片盖住。你要猜测这个数字。
-每场 30 轮。基于你的全部历史数据，用贝叶斯方法计算"灵性起效"的概率。
+支持 raricy 账号登录、账号历史与中英 PDF 图表报告。游客实验不落盘，登录用户按账号归档。配置与数据边界见 [账号与报告说明](docs/11-account-and-reports.md)，正式回调为 `https://ling.raricy.com/oauth/callback`；先按 `.env.example` 配置 OAuth 应用凭证。
+
+包含三个独立实验与日常灵性体验量表 DSES：
+
+- **隐藏信息感知**：服务端先生成并固定 1–5 目标，提交猜测后揭晓。
+- **未来事件预知**：先锁定猜测，再由服务端生成目标。
+- **双人心灵感应**：发送者创建房间，接收者凭邀请码加入。每轮发送者选择一个候选符号并点击“锁定并发送”，随后发送期与接收者作答期各 15 秒；揭晓时比较双方选择是否相同。锁定后不能修改，未作答的超时轮不计分。发送者尚未选择时不计时。
+- **DSES**：作者英文原版 PDF，中文答题说明、逐题主题摘要与独立答题卡；按作者 2022 年说明计分。中文辅助内容不是经验证的中文译本。问卷为体验自评，不与实验命中率混算。
+
+实验结果按类型、协议版本和随机基线分别汇总。新双人场次使用协议 v3，没有随机对照轮；双方自由选择可能有数字偏好，因此只报告一致率及其模型区间，不假设固定 20% 机会基线。单人协议 v2 与旧双人随机目标协议 v2 保留原统计方式，v1 记录单独保留。结果不能据此认定存在超自然能力。
 
 ## 运行
 
+需要 Node.js 22 或更新版本（后端原生加载 `.env`）。
+
 ```bash
 npm install
-npm run dev          # 启动 Vite dev server (http://localhost:5173)
-npm test             # 跑 vitest 单元测试
-npm run build        # 生产构建到 dist/
+npm run dev          # 同时启动实验服务 :3001 和 Vite :5173
+npm run build        # 生成 dist/，包含 DSES 原版 PDF
+npm start            # 服务端同时提供 dist/ 和 /api，默认 :3001
 ```
 
-## 核心机制
+开发时访问 `http://localhost:5173`，生产构建后访问 `http://localhost:3001`。双人实验的两台设备必须访问**同一台服务器**；同一局域网可使用服务器的局域网 IP，开发模式端口为 5173。请分开进行，不用声音、消息或屏幕互相提示。
 
-**目标数时序**：每一轮的目标数字在用户进入猜测阶段**之前**就已经生成并冻结。具体架构级保证见 `docs/03-core-mechanics.md`。
+生产服务支持 `PORT` 和 `HOST` 环境变量。开发代理固定连接本机 3001，开发时不要单独更改服务端端口。`npm run dev:client` 和 `npm run dev:server` 可分别启动两部分。`npm run preview` 仅预览静态构建，不能代替实验服务。
 
-**统计指标**：采用 **Savage-Dickey 密度比**作为默认概率指标。
+## 界面与偏好
 
-$$
-P(\text{灵性起效}) = P(p \neq 0.20 \mid \text{data}) = \frac{1}{1 + \text{BF}_{01}}
-$$
+三个实验都支持六套候选符号，开始前六选一：`12345`、`ABCDE`、星星／月亮／太阳／黑洞／地球图标、`🟥 🟧 🟨 🟩 🟦`、`😀 😢 😡 😨 😴`、`⬆️ ⬇️ ⬅️ ➡️ 🔄`。每套仍是五个候选值。双人房间由发送者创建时选择，接收者加入后自动同步，整场不能更换。快捷键 1–5 对应从左到右的五个选项。刷新和历史导出会保留该组；点击“再测一次”或发送者“创建新房间”会返回选择页，预选上一场的候选组和回合数，确认后才开始新实验。接收者返回加入房间页。旧记录默认数字，历史按候选组分别汇总。
 
-$$
-\text{BF}_{01} = \frac{f(0.20 \mid \text{data})}{f(0.20)} \quad \text{（先验 Beta(1, 1) ⇒ f(0.20) = 1）}
-$$
+右上角 **中 / En** 切换中文与英文，**月亮 / 太阳** 切换暗色与亮色；语言和主题保存在当前设备，切换时保留正在进行的实验和问卷答案。DSES 选项在中文界面只显示中文，在英文界面只显示英文。设置中仍可选择跟随系统主题。首页的 DSES 卡片保留，顶部不再提供重复入口。
 
-UI 同时支持切换到 `P(p > 0.20)`（单边）和 95% 可信区间两种视图。
+开屏轨道动画约 1.4 秒，可点击或按键跳过；系统启用减少动画时直接进入页面，恢复进行中的实验时也会跳过。图标已下载至 `public/icons/`，授权说明见 `public/icons/LICENSE-lucide.txt`，运行时不依赖外部图标服务。
 
-详细推导与边界情况见 `docs/06-statistics.md`。
+## 数据与实验边界
 
-## 文件结构
+服务端使用加密随机数，按凭证决定角色，只向各角色返回允许查看的字段。浏览器刷新通过当前标签页的 `sessionStorage` 凭证恢复同一场实验，不在断网时生成替代目标。
 
+活动实验与凭证仅在服务内存中；游客结果不落盘，结束后清理。登录用户的终态安全快照与问卷保存在私有 `.data/accounts.json`，按 OAuth 的稳定账号 ID 隔离。该目录不通过 HTTP 提供，也不进入 Git；仅支持一个服务进程写入。旧 `.data/experiments.json` 不再加载或写入。双人终态仅为未领取的参与者暂留最多五分钟，详见账号与报告说明。
+
+游客浏览器将终态历史保存于 `spirituality:v2:history`，DSES 保存在 `spirituality:v2:dses`，不上传游客问卷。登录用户从账号读取历史，DSES 提交到账号；不自动迁移本机数据。历史导出不包含房间凭证或未揭晓目标。旧版 `spirituality:v1:*` 记录保留并在游客界面独立显示。
+
+心灵感应双方的选择在揭晓前互相隐藏；接收者不能设置目标，发送者不能提交接收者答案。旧协议 v2 的分组仍在整场结束后才向接收者公开。主动放弃会保留已锁定猜测并立即结算该轮，以防通过放弃删除结果；这类场次标为 ABANDONED，结束时间与提前揭晓时间均记录。严格研究分析应预先规定未完成场次与超时的处理规则。
+
+## 必要验证
+
+```bash
+npm test             # 前端与纯函数测试
+npm run test:server  # 服务端协议、权限、计时与持久化的本机 HTTP 测试
+npm run build
 ```
-src/
-├── lib/                纯函数模块（rng, betainc, statistics, state-machine, storage, schema）
-├── hooks/              自定义 React hooks
-├── components/         UI 组件（macOS 风格 + CSS Modules）
-├── styles/             CSS 变量 token + globals
-├── App.jsx             顶层装配
-└── main.jsx            入口
-docs/                   设计文档（7 份）
-```
 
-## 测试
+## DSES 来源
 
-51 个测试，全部通过：
+英文文件来自[作者官网原版 PDF](https://www.dsescale.org/DSES.pdf)，计分依据[作者 2022 年说明](https://www.dsescale.org/scoring-of-the-daily-spiritual-experience-scale/)。量表版权归 Lynn G. Underwood，使用须按官网要求登记并取得许可；本项目未代用户申请授权。中文内容只作主题摘要与答题辅助，未完整翻译原题。
 
-- `src/lib/__tests__/state-machine.test.js` — 状态机转移矩阵、target 不可变性
-- `src/lib/__tests__/statistics.test.js` — betainc、贝叶斯指标、用户反例
-- `src/lib/__tests__/rng.test.js` — 数字生成
-- `src/components/__tests__/components.test.jsx` — 组件渲染
-
-## 数据持久化
-
-所有数据存储于浏览器 `localStorage`：
-
-- `spirituality:v1:sessions` — Session 列表
-- `spirituality:v1:settings` — 应用设置
-- `spirituality:v1:schemaVersion` — schema 版本（用于未来迁移）
-
-UI 中支持 **导出 JSON / 导入 JSON / 清空全部**。
+扩展设计、协议与 DSES 下载信息见 [docs/00-README.md](docs/00-README.md)、[docs/09-implementation-contract.md](docs/09-implementation-contract.md) 与 [docs/10-dses-questionnaire.md](docs/10-dses-questionnaire.md)。

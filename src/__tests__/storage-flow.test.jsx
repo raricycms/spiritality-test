@@ -1,135 +1,99 @@
-// Storage persistence: completed sessions must survive "再来一次" / refresh.
-// Regression test for the bug where useSession.endAndArchive wrote
-// [...history, final] to localStorage but never updated useHistory's React
-// state, so the next useAutoSave tick (using stale history) overwrote the
-// just-archived session.
-import { describe, it, expect, afterEach, vi } from 'vitest'
-import { render, screen, fireEvent, cleanup } from '@testing-library/react'
+// Server-backed terminal persistence (replaces the old localStorage autosave
+// tests). Terminal snapshots are written immediately, by id, to the independent
+// v2 history; legacy v1 data is never merged or overwritten.
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { loadSessions } from '../lib/storage.js'
-import { aggregateRounds } from '../lib/statistics.js'
+
+import { App } from '../App.jsx'
+import { fakeApi, soloSnapshot } from './helpers/fake-api.js'
+
+vi.mock('../lib/experiment-api.js', async () => (await import('./helpers/fake-api.js')).fakeApi)
+
+vi.mock('../components/ExperimentResults.jsx', () => ({
+  ExperimentResults: ({ session }) => <div>实验结果 {session?.id}</div>,
+}))
+
+vi.mock('../components/ExperimentHistory.jsx', () => ({
+  ExperimentHistory: ({ sessions }) => <div data-testid="v2-history">v2 共 {sessions.length} 条</div>,
+}))
+
+const hist = vi.hoisted(() => ({ store: [] }))
+
+vi.mock('../lib/experiment-history.js', () => ({
+  loadExperimentHistory: () => hist.store,
+  saveExperimentHistory: (sessions) => {
+    hist.store = sessions
+  },
+  mergeExperimentHistory: (a = [], b = []) => {
+    const map = new Map(a.map((s) => [s.id, s]))
+    for (const s of b) map.set(s.id, s)
+    return [...map.values()]
+  },
+}))
+
+beforeEach(() => {
+  fakeApi.reset()
+  hist.store = []
+  localStorage.clear()
+  sessionStorage.clear()
+})
 
 afterEach(() => {
   cleanup()
   vi.restoreAllMocks()
-  localStorage.clear()
 })
 
-const TOTAL_ROUNDS = 30
-
-function playOneRound(buttonName = '1') {
-  fireEvent.click(screen.getByRole('radio', { name: buttonName }))
-  fireEvent.click(screen.getByRole('button', { name: /提交|下一题/ }))
-  const next = screen.queryByRole('button', { name: /下一题/ })
-  if (next) fireEvent.click(next)
-}
-
-// Realistic pacing — 120ms between rounds so the 100ms autosave debounce
-// can fire between actions.
-async function playFullSession(buttonName = '1') {
-  for (let i = 0; i < TOTAL_ROUNDS; i++) {
-    playOneRound(buttonName)
-    await new Promise((r) => setTimeout(r, 120))
-  }
-  expect(screen.getByText(/测试结束/)).toBeInTheDocument()
-}
-
-// Rapid pacing — clicks back-to-back with no delay. Mirrors the user's
-// report ("做完三轮之后好像只存了79条") where autosave never gets a chance
-// to fire and the only thing protecting data is appendSession on restart.
-async function playFullSessionRapid(buttonName = '1') {
-  for (let i = 0; i < TOTAL_ROUNDS; i++) playOneRound(buttonName)
-  expect(screen.getByText(/测试结束/)).toBeInTheDocument()
-}
-
-async function startAndCompleteFirstSession(pacing = 'realistic') {
-  fireEvent.click(screen.getByRole('button', { name: /开始一场测试/ }))
-  if (pacing === 'realistic') await playFullSession('1')
-  else await playFullSessionRapid('1')
-  if (pacing === 'realistic') await new Promise((r) => setTimeout(r, 150))
-}
-
-async function clickRestart(pacing = 'realistic') {
-  fireEvent.click(screen.getByRole('button', { name: /再来一次/ }))
-  if (pacing === 'realistic') await new Promise((r) => setTimeout(r, 150))
-}
-
-function summarise(sessions) {
-  return sessions.reduce((acc, s) => {
-    const a = aggregateRounds(s.rounds)
-    return { k: acc.k + a.k, n: acc.n + a.n }
-  }, { k: 0, n: 0 })
-}
-
-function expectSessionsComplete(sessions, expectedCount) {
-  expect(sessions).toHaveLength(expectedCount)
-  for (const s of sessions) {
-    expect(s.status).toBe('COMPLETED')
-    expect(s.rounds).toHaveLength(TOTAL_ROUNDS)
+function completedSnapshot(id) {
+  return {
+    sessionId: id,
+    token: 'tok',
+    role: 'receiver',
+    snapshot: soloSnapshot({ id, status: 'COMPLETED', completedAt: 2000, rounds: [], activeRound: null }),
   }
 }
 
-describe('storage persistence across multiple sessions', () => {
-  it('after 3 full sessions + 2 restarts (realistic pacing), localStorage holds all 90 rounds', async () => {
-    vi.spyOn(Math, 'random').mockImplementation(() => 0.05)
-    const { App } = await import('../App.jsx')
-    render(<App />)
+function startHidden() {
+  render(<App />)
+  fireEvent.click(screen.getAllByRole('button', { name: '选择' })[0])
+  fireEvent.click(screen.getByRole('button', { name: /开始实验/ }))
+}
 
-    await startAndCompleteFirstSession('realistic')
-    await clickRestart('realistic')
-    await playFullSession('1')
-    await clickRestart('realistic')
-    await playFullSession('1')
+describe('v2 terminal history persistence', () => {
+  it('writes a completed snapshot to the independent v2 store, not v1', async () => {
+    fakeApi.setHandlers({ create: () => completedSnapshot('s1') })
+    startHidden()
 
-    const sessions = loadSessions()
-    expect(summarise(sessions).n).toBe(90)
-    expectSessionsComplete(sessions, 3)
-  }, 30000)
+    await screen.findByText(/实验结果/)
+    await waitFor(() => expect(hist.store).toHaveLength(1))
+    expect(hist.store[0]).toMatchObject({ id: 's1', status: 'COMPLETED' })
+    expect(localStorage.getItem('spirituality:v1:sessions')).toBeNull()
+  })
 
-  it('rapid clicks: appendSession on restart still preserves the just-completed session', async () => {
-    // This is the exact user-reported scenario: clicks faster than the
-    // 100ms autosave debounce. Without the fix, useAutoSave would write
-    // [...staleHistory, newSession] overwriting the just-archived session.
-    // Each session is followed by a "再来一次" click so appendSession —
-    // not autosave — is the path that persists the data.
-    vi.spyOn(Math, 'random').mockImplementation(() => 0.05)
-    const { App } = await import('../App.jsx')
-    render(<App />)
+  it('never aggregates v1 records into the new protocol data', async () => {
+    localStorage.setItem(
+      'spirituality:v1:sessions',
+      JSON.stringify([{ id: 'v1-1', status: 'COMPLETED', createdAt: 1, rounds: [] }]),
+    )
+    fakeApi.setHandlers({ create: () => completedSnapshot('s2') })
+    startHidden()
 
-    fireEvent.click(screen.getByRole('button', { name: /开始一场测试/ }))
-    await playFullSessionRapid('1')
-    await clickRestart('rapid')
-    await playFullSessionRapid('1')
-    await clickRestart('rapid')
-    await playFullSessionRapid('1')
-    await clickRestart('rapid')
+    await screen.findByText(/实验结果/)
+    await waitFor(() => expect(hist.store.map((s) => s.id)).toEqual(['s2']))
+    const v1 = JSON.parse(localStorage.getItem('spirituality:v1:sessions'))
+    expect(v1.map((s) => s.id)).toEqual(['v1-1'])
+  })
 
-    const sessions = loadSessions()
-    expect(summarise(sessions).n).toBe(90)
-    expectSessionsComplete(sessions, 3)
-  }, 30000)
-
-  it('the K/N aggregate is stable across a page reload', async () => {
-    vi.spyOn(Math, 'random').mockImplementation(() => 0.05)
-    const { App } = await import('../App.jsx')
+  it('keeps the v2 record available in the history view after a remount', async () => {
+    fakeApi.setHandlers({ create: () => completedSnapshot('s3') })
     const { unmount } = render(<App />)
-
-    await startAndCompleteFirstSession('realistic')
-    await clickRestart('realistic')
-    await playFullSession('1')
-    await clickRestart('realistic')
-    await playFullSession('1')
-
-    const before = summarise(loadSessions())
-
-    // Simulate a page reload: unmount and remount. useHistory re-runs
-    // loadSessions() on mount, so any drift between React state and
-    // localStorage would surface here.
+    fireEvent.click(screen.getAllByRole('button', { name: '选择' })[0])
+    fireEvent.click(screen.getByRole('button', { name: /开始实验/ }))
+    await screen.findByText(/实验结果/)
     unmount()
-    render(<App />)
-    const after = summarise(loadSessions())
 
-    expect(after).toEqual(before)
-    expect(after.n).toBe(90)
-  }, 30000)
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: '历史' }))
+    expect(screen.getByTestId('v2-history')).toHaveTextContent('v2 共 1 条')
+  })
 })

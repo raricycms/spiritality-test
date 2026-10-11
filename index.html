@@ -3,8 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f5f5f7" />
-    <title>灵性测试</title>
+    <meta name="theme-color" content="#f3f6fb" />
+    <title>灵性实验室</title>
+    <script>
+      // Apply saved appearance before the first paint, including the opening.
+      try {
+        const pref = JSON.parse(localStorage.getItem('spirituality:v1:settings') || '{}').theme || 'auto';
+        const theme = pref === 'dark' || (pref === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+        document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#131d2b' : '#f3f6fb';
+        if (localStorage.getItem('spirituality:ui:language') === 'en') {
+          document.documentElement.lang = 'en';
+          document.title = 'Spirituality Lab';
+        }
+      } catch (_) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

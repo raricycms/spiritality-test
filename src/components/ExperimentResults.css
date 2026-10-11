@@ -1,0 +1,135 @@
+.experiment-results {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  border: 1px solid var(--color-card-border);
+  color: var(--color-text);
+}
+
+.er-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.er-title {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.er-meta {
+  margin: 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.er-tag {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: white;
+}
+
+.er-tag-muted {
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+}
+
+.er-session-id {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.er-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.er-block-title {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.er-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.er-cell {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--color-bg);
+}
+
+.er-cell dt {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 4px;
+}
+
+.er-cell dd {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.er-note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.er-note-warn {
+  color: #b26a00;
+}
+
+.er-caveat {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.er-conditions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-card-border);
+}
+
+.er-conditions-title {
+  margin: 0;
+  font-size: 15px;
+}
+
+.er-difference {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--color-bg);
+  font-size: 14px;
+}
+
+.er-difference strong {
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.er-diff-hint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}

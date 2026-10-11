@@ -1,57 +1,74 @@
-// Reproduction of the "再来一次 doesn't work" bug.
+// Server-backed round flow (replaces the old local restart reproduction).
+// A solo guess is scored by the server, and advancing asks the server for the
+// next round — the client never generates targets.
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { render, screen, fireEvent, cleanup, act } from '@testing-library/react'
+import { render, screen, fireEvent, cleanup } from '@testing-library/react'
 import '@testing-library/jest-dom'
+
+import { App } from '../App.jsx'
+import { fakeApi, soloSnapshot, round } from './helpers/fake-api.js'
+
+vi.mock('../lib/experiment-api.js', async () => (await import('./helpers/fake-api.js')).fakeApi)
+
+vi.mock('../components/ExperimentResults.jsx', () => ({
+  ExperimentResults: ({ session }) => <div>实验结果 {session?.id}</div>,
+}))
+
+vi.mock('../components/ExperimentHistory.jsx', () => ({
+  ExperimentHistory: () => <div data-testid="v2-history" />,
+}))
+
+vi.mock('../lib/experiment-history.js', () => ({
+  loadExperimentHistory: () => [],
+  saveExperimentHistory: () => {},
+  mergeExperimentHistory: (a) => a,
+}))
+
+beforeEach(() => {
+  fakeApi.reset()
+  localStorage.clear()
+  sessionStorage.clear()
+})
 
 afterEach(() => {
   cleanup()
   vi.restoreAllMocks()
 })
 
-beforeEach(() => {
-  localStorage.clear()
-})
+function auth(snapshot) {
+  return { sessionId: snapshot.id, token: 'tok', role: snapshot.role, snapshot }
+}
 
-describe('App restart flow', () => {
-  it('after completing 30 rounds, "再来一次" starts a fresh session', async () => {
-    // Deterministic RNG: all targets = 1
-    vi.spyOn(Math, 'random').mockImplementation(() => 0.05)
+describe('server-backed solo round flow', () => {
+  it('submits a guess, shows the reveal, then advances to the next round', async () => {
+    fakeApi.setHandlers({
+      create: () =>
+        auth(soloSnapshot({ activeRound: round({ id: 'r1', index: 0, status: 'TARGET_READY' }) })),
+      guess: (id, body) =>
+        soloSnapshot({
+          rounds: [round({ id: 'r1', index: 0, status: 'REVEALED', target: 3, guess: body.guess, correct: true, revealedAt: 2 })],
+          activeRound: round({ id: 'r1', index: 0, status: 'REVEALED', target: 3, guess: body.guess, correct: true, revealedAt: 2 }),
+        }),
+      next: () =>
+        soloSnapshot({
+          rounds: [round({ id: 'r1', index: 0, status: 'REVEALED', target: 3, guess: 3, correct: true, revealedAt: 2 })],
+          activeRound: round({ id: 'r2', index: 1, status: 'TARGET_READY' }),
+        }),
+    })
 
-    const { App } = await import('../App.jsx')
     render(<App />)
+    fireEvent.click(screen.getAllByRole('button', { name: '选择' })[0])
+    fireEvent.click(screen.getByRole('button', { name: /开始实验/ }))
+    await screen.findByRole('radio', { name: '3' })
 
-    // 1. Start a session.
-    fireEvent.click(screen.getByRole('button', { name: /开始一场测试/ }))
+    fireEvent.click(screen.getByRole('radio', { name: '3' }))
+    fireEvent.click(screen.getByRole('button', { name: /提交/ }))
+    await screen.findByText(/命中/)
 
-    // 2. Play all 30 rounds: pick digit 1, submit, advance.
-    for (let i = 0; i < 30; i++) {
-      // Pick 1 (the deterministic target).
-      fireEvent.click(screen.getByRole('radio', { name: '1' }))
-      // Submit.
-      const submitBtn = screen.getByRole('button', { name: /提交|下一题/ })
-      fireEvent.click(submitBtn)
-      // If we're on the last round, after submit the SessionSummary shows.
-      // Otherwise, we get the "下一题" button which advances.
-      // Click 下一题 if present (only for rounds 1..29, NOT after the last submit).
-      const nextBtn = screen.queryByRole('button', { name: /下一题/ })
-      if (nextBtn) {
-        fireEvent.click(nextBtn)
-      }
-    }
+    expect(fakeApi.calls('guess')[0][1][1]).toEqual({ roundId: 'r1', guess: 3, confidence: null })
 
-    // We should now see the SessionSummary.
-    expect(screen.getByText(/测试结束/)).toBeInTheDocument()
-
-    // 3. Click 再来一次.
-    const restartBtn = screen.getByRole('button', { name: /再来一次/ })
-    fireEvent.click(restartBtn)
-
-    // 4. Expect a new round to be active.
-    // After clicking 再来一次, SessionSummary should be GONE and RoundView should appear.
-    expect(screen.queryByText(/测试结束/)).not.toBeInTheDocument()
-    expect(screen.getByRole('img', { name: /被遮挡/ })).toBeInTheDocument()
-    // Round counter should show "第 1 / 30 轮" again.
-    expect(document.body.textContent).toContain('1')
-    expect(document.body.textContent).toContain('30')
-  }, 15000)
+    fireEvent.click(screen.getByRole('button', { name: /下一轮/ }))
+    await screen.findByText(/第 2 \/ 30 轮/)
+    expect(fakeApi.calls('next')[0][1][1]).toEqual({ roundId: 'r1' })
+  })
 })
