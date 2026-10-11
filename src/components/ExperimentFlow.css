@@ -308,6 +308,20 @@
   gap: 14px;
 }
 
+.flow-sender {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.flow-sender .target-face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .flow-answer-line {
   font-size: 14px;
   color: var(--color-text-secondary);
